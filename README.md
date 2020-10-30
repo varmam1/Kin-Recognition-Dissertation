@@ -136,4 +136,6 @@ Timeline and Milestones
 
 14. **Apr 23 - May 14**:\
     If everything has gone well, this should be where final touches are
-    applied. **Deliverable**: The completed dissertation
+    applied. 
+    
+    **Deliverable**: The completed dissertation
