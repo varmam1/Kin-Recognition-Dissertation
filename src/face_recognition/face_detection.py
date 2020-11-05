@@ -3,9 +3,7 @@ import cv2
 
 image = cv2.imread("test.jpg")
 
-# TODO: Create function that saves each face as it's own image rather than just adds the rectangle to the image. 
-
-def face_recognizer(img):
+def face_detector(img):
     """
     Given an image, returns a list of tuples (x, y, w, h) where (x, y) is the coordinate of the top left vertex and
     (w, h) represents the width and height of the face. 
@@ -84,4 +82,4 @@ def save_faces(img, faces, width, height):
         # TODO: Change output string
         save_image(resize_img(img[y:y+h, x:x+w], width, height), 'out' + str(i) + '.jpg')
 
-save_faces(image, face_recognizer(image), 100, 100)
+save_faces(image, face_detector(image), 64, 64)
