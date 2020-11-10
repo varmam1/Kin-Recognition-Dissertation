@@ -1,8 +1,6 @@
 import numpy as np
 import cv2
 
-image = cv2.imread("test.jpg")
-
 def face_detector(img):
     """
     Given an image, returns a list of tuples (x, y, w, h) where (x, y) is the coordinate of the top left vertex and
@@ -82,4 +80,12 @@ def save_faces(img, faces, width, height):
         # TODO: Change output string
         save_image(resize_img(img[y:y+h, x:x+w], width, height), 'out' + str(i) + '.jpg')
 
-save_faces(image, face_detector(image), 64, 64)
+
+def save_faces_in_64_by_64(image):
+    """
+    Given an image which is an np.array, saves the faces in the image in a file with dimenesions of 64x64. 
+
+    Keyword Arguments:
+    - image: An np.array which is of shape (w, h, 3) which is a representation of the image. 
+    """
+    save_faces(image, face_detector(image), 64, 64)
