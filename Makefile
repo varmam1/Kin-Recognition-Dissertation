@@ -7,7 +7,7 @@ runTests:
 	py.test src/test
 
 coverage:
-	coverage run --omit 'venv/*' -m py.test src/test && coverage report -m
+	coverage run -m py.test src/test && coverage report -m
 
 testLBP:
 	python3 -m src.face_descriptors.LBP
