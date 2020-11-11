@@ -3,7 +3,7 @@
 Core Components Left to Implement
 =================================
 
-1. Face detection and saving the faces as an image. 
+1. ~~Face detection and saving the faces as an image.~~
 2. Creating the 4 face descriptors: LBP, HOG, SIFT, VGG
 3. Creating the penalty graphs and intrinsic graph
 4. Using the graphs to calculate the necessary metrics to determine if the pair of faces is of the given relationship
