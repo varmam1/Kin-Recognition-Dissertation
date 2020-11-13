@@ -21,4 +21,10 @@ def compute_gradients(img):
     gx = cv2.Sobel(img, cv2.CV_32F, 1, 0, ksize=1)
     gy = cv2.Sobel(img, cv2.CV_32F, 0, 1, ksize=1)
     magnitude, angle = cv2.cartToPolar(gx, gy, angleInDegrees=True)
+
+    # If the image is colored, take the max for each pixel along the 3 channels
+    if len(img.shape) == 3:
+        magnitude = np.amax(magnitude, axis=(2))
+        angle = np.amax(angle, axis=(2))
+    
     return (magnitude, angle)
