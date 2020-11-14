@@ -32,7 +32,17 @@ def compute_gradients(img):
 
 def create_block_HOG_vector(blockMagnitudes, blockAngles):
     """
+    Given the magnitudes and angles of the gradients of a block of an image, returns the 
+    9-dimensional histogram for the block. The counts for each angle are weighted by the magnitude
+    and by how far the angle is from the necessary angles. For example, if a pixel had a gradient with 
+    angle 30 and magnitude 2, it would contribute 1 to the 20 bin and 1 to the 40 bin. 
 
+    Keyword Arguments:
+    - blockMagnitudes (np.array) : A numpy array of shape (w, h) which has the magnitudes of the gradient for each pixel in the block.
+    - blockAngles (np.array) : A numpy array of shape (w, h) which has the unsigned angles of the gradient for each pixel in the block.
+
+    Returns:
+    - A numpy array of shape (9, ) which is the histogram of the given block as defined above. 
     """
     vec = np.zeros(9)
     # For each cell, divide angle by 20 to find out what cell it's supposed to be in
@@ -44,9 +54,6 @@ def create_block_HOG_vector(blockMagnitudes, blockAngles):
     addToUpperBins = blockMagnitudes - addToLowerBins
     lowerBins = np.uint8(np.floor(bins))
     upperBins = np.uint8(np.ceil(bins) % 9)
-    # TODO: Ew for loops. Need to vectorize this bad boi.
-    for i in range(0, addToLowerBins.shape[0]):
-        for j in range(0, addToLowerBins.shape[1]):
-            vec[lowerBins[i, j]] += addToLowerBins[i, j]
-            vec[upperBins[i, j]] += addToUpperBins[i, j]
+    np.add.at(vec, lowerBins, addToLowerBins)
+    np.add.at(vec, upperBins, addToUpperBins)
     return vec
