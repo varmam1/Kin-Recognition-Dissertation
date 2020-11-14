@@ -5,7 +5,7 @@ import cv2
 
 def compute_gradients(img):
     """
-    Given a colored image, computes the gradients for each point and returns the magnitude
+    Given a colored image, computes the unsigned gradients for each point and returns the magnitude
     and angle for each point. 
 
     Keyword Arguments:
@@ -15,7 +15,7 @@ def compute_gradients(img):
     - A tuple of the magnitude and angle np arrays. 
         - magnitude (np.array): An array representing the magnitude of the gradient at each pixel
         - angle (np.array): An array representing the angle of the gradient with respect to the x axis
-                            at each pixel.
+                            at each pixel. Ranges from 0 to 180.
     """
     img = np.float32(img)/ 255.0
     gx = cv2.Sobel(img, cv2.CV_32F, 1, 0, ksize=1)
@@ -27,4 +27,26 @@ def compute_gradients(img):
         magnitude = np.amax(magnitude, axis=(2))
         angle = np.amax(angle, axis=(2))
     
+    angle = angle % 180
     return (magnitude, angle)
+
+def create_block_HOG_vector(blockMagnitudes, blockAngles):
+    """
+
+    """
+    vec = np.zeros(9)
+    # For each cell, divide angle by 20 to find out what cell it's supposed to be in
+    bins = blockAngles/20
+    # Create the amount they weigh towards the lower bin and the upper bin. If a value is an integer, its fully unde
+    # weightsTowardsLower. So if a value of an element is 2, then the corresponding values are 1 and 0 for each.
+    weightsTowardsLower = (20*(np.floor(bins)+1)-blockAngles)/20
+    addToLowerBins = blockMagnitudes*weightsTowardsLower
+    addToUpperBins = blockMagnitudes - addToLowerBins
+    lowerBins = np.uint8(np.floor(bins))
+    upperBins = np.uint8(np.ceil(bins) % 9)
+    # TODO: Ew for loops. Need to vectorize this bad boi.
+    for i in range(0, addToLowerBins.shape[0]):
+        for j in range(0, addToLowerBins.shape[1]):
+            vec[lowerBins[i, j]] += addToLowerBins[i, j]
+            vec[upperBins[i, j]] += addToUpperBins[i, j]
+    return vec
