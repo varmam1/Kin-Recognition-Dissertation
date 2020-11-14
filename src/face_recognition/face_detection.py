@@ -15,7 +15,7 @@ def face_detector(img):
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
     # faceCascade imports in the previously made classifier
-    faceCascade = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
+    faceCascade = cv2.CascadeClassifier('src/face_recognition/haarcascade_frontalface_default.xml')
     faces = faceCascade.detectMultiScale(
         gray,     
         scaleFactor=1.2,
@@ -24,22 +24,6 @@ def face_detector(img):
     )
 
     return faces
-
-def draw_rectangle_on_faces(img, faces):
-    """
-    Given the faces and an image, will draw rectangles around the faces in the image and return the image. 
-
-    Keyword Arguments:
-    - img: The image that the rectangles are going to be drawn on.
-    - faces (List[(Int, Int, Int, Int)]): A list of faces specified by the top left vertex and the width and height of the face
-
-    Returns:
-    - The image with the rectangles drawn over the faces. 
-    """
-    rect_img = img
-    for (x,y,w,h) in faces:
-        cv2.rectangle(rect_img,(x,y),(x+w,y+h),(255,0,0),2)
-    return rect_img
 
 def resize_img(img, width, height):
     """
