@@ -1,4 +1,5 @@
 import numpy as np
+from math import sqrt
 import cv2
 
 # Create a 2880-dim vector by having 9 dim vector for 16x16 blocks then for 8x8 blocks
@@ -58,6 +59,25 @@ def create_block_HOG_vector(blockMagnitudes, blockAngles):
     np.add.at(vec, upperBins, addToUpperBins)
     return vec
 
+def L2_norm_normalization(vec):
+    """
+    Returns the L2 norm of the given vector. This is defined as: 
+    
+    v / sqrt(|v|^2 + epsilon^2)
+    
+    in the paper "Histograms of Oriented Gradients for Human Detection"
+    where epsilon is a small regularization constant. 
+
+    Keyword Arguments:
+    - vec (np.array) : A numpy array of the feature descriptor needed to be normalized
+
+    Returns:
+    - The L2 norm of the vector as an np.array. 
+    """
+    norm = np.linalg.norm(vec)
+    epsilon = 0.01
+    return vec/sqrt(norm**2 + epsilon ** 2)
+
 def get_HOG_feature_vector(img):
     """
     Given an image, returns the HOG feature vector. If the image is 64x64, then 
@@ -73,13 +93,14 @@ def get_HOG_feature_vector(img):
     vec = np.array([])
     # First get vectors for the 16x16 blocks
     firstSize = (int(img.shape[0]/16), int(img.shape[1]/16))
-    firstBlockVecs = np.zeros((16, 16, 9))
+    # firstBlockVecs = np.zeros((16, 16, 9))
     for i in range(0, 16):
         for j in range(0, 16):
             blockMags = magnitudes[firstSize[0]*i : (firstSize[0] + 1)*i, firstSize[1]*j : (firstSize[1] + 1)*j]
             blockAngles = angles[firstSize[0]*i : (firstSize[0] + 1)*i, firstSize[1]*j : (firstSize[1] + 1)*j]
             blockVec = create_block_HOG_vector(blockMags, blockAngles)
-            firstBlockVecs[i, j] = blockVec
+            vec = np.append(vec, blockVec)
+            # firstBlockVecs[i, j] = blockVec
 
     # Then get the vectors for the 8x8 blocks
     secondSize = (int(img.shape[0]/8), int(img.shape[1]/8))
@@ -89,8 +110,13 @@ def get_HOG_feature_vector(img):
             blockMags = magnitudes[secondSize[0]*i : (secondSize[0] + 1)*i, secondSize[1]*j : (secondSize[1] + 1)*j]
             blockAngles = angles[secondSize[0]*i : (secondSize[0] + 1)*i, secondSize[1]*j : (secondSize[1] + 1)*j]
             blockVec = create_block_HOG_vector(blockMags, blockAngles)
-            secondBlockVecs[i, j] = blockVec
+            vec = np.append(vec, blockVec)
+            # secondBlockVecs[i, j] = blockVec
 
-    # TODO: Add normalization to the feature vector
-    # For normalization of 8x8 blocks, use sliding window of 2 blocks by 2 blocks. 
+    # TODO: As a potential improvement to the paper, normalize the HOG feature vectors as this improves performance
+    #       and the paper doesn't seem to do this normalization. They just say "A 9-dimensional feature vector is computed
+    #       for each block. Finally, we concatenate all these vectors together and get a 2880-dimensional feature vector"
+
+    # TODO: For normalization of 8x8 blocks, use sliding window of 2 blocks by 2 blocks and use the L2 norm as made above.
+ 
     return vec

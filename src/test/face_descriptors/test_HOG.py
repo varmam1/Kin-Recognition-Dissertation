@@ -1,5 +1,6 @@
 import pytest
 import numpy as np
+from math import sqrt
 from ...face_descriptors import HOG
 
 # =================== Testing Compute Gradient Function ===================
@@ -58,6 +59,17 @@ def test_block_histogram_creator():
 
 def test_block_histogram_creator_on_empty_input():
     assert np.array_equal(np.zeros(9), HOG.create_block_HOG_vector(np.array([]), np.array([])))
+
+# ====================== Testing L2 Norm Normalization Function =====================
+
+def test_L2_norm_on_zero_vector():
+    vec = np.zeros(9)
+    assert np.array_equal(HOG.L2_norm_normalization(vec), vec)
+
+def test_L2_norm_on_standard_vector():
+    vec = np.array([3, 4])
+    expectedNorm = np.array([3/sqrt(25 + 0.0001), 4/sqrt(25 + 0.0001)])
+    assert np.array_equal(HOG.L2_norm_normalization(vec), expectedNorm)
 
 # =================== Testing Overall HOG Feature Vector Function ===================
 
