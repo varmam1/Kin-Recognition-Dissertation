@@ -17,7 +17,7 @@ def compute_gradients(img):
         - angle (np.array): An array representing the angle of the gradient with respect to the x axis
                             at each pixel. Ranges from 0 to 180.
     """
-    img = np.float32(img)/ 255.0
+    img = np.float32(img)
     gx = cv2.Sobel(img, cv2.CV_32F, 1, 0, ksize=1)
     gy = cv2.Sobel(img, cv2.CV_32F, 0, 1, ksize=1)
     magnitude, angle = cv2.cartToPolar(gx, gy, angleInDegrees=True)
@@ -56,4 +56,41 @@ def create_block_HOG_vector(blockMagnitudes, blockAngles):
     upperBins = np.uint8(np.ceil(bins) % 9)
     np.add.at(vec, lowerBins, addToLowerBins)
     np.add.at(vec, upperBins, addToUpperBins)
+    return vec
+
+def get_HOG_feature_vector(img):
+    """
+    Given an image, returns the HOG feature vector. If the image is 64x64, then 
+    the resulting vector will be 2880-dimensional. 
+
+    Keyword Arguments:
+    - img (np.array) : An np array representation of the image
+
+    Returns:
+    - A Histogram of Gradients feature vector of the image. 
+    """
+    magnitudes, angles = compute_gradients(img)
+    vec = np.array([])
+    # First get vectors for the 16x16 blocks
+    firstSize = (int(img.shape[0]/16), int(img.shape[1]/16))
+    firstBlockVecs = np.zeros((16, 16, 9))
+    for i in range(0, 16):
+        for j in range(0, 16):
+            blockMags = magnitudes[firstSize[0]*i : (firstSize[0] + 1)*i, firstSize[1]*j : (firstSize[1] + 1)*j]
+            blockAngles = angles[firstSize[0]*i : (firstSize[0] + 1)*i, firstSize[1]*j : (firstSize[1] + 1)*j]
+            blockVec = create_block_HOG_vector(blockMags, blockAngles)
+            firstBlockVecs[i, j] = blockVec
+
+    # Then get the vectors for the 8x8 blocks
+    secondSize = (int(img.shape[0]/8), int(img.shape[1]/8))
+    secondBlockVecs = np.zeros((8, 8, 9))
+    for i in range(0, 8):
+        for j in range(0, 8):
+            blockMags = magnitudes[secondSize[0]*i : (secondSize[0] + 1)*i, secondSize[1]*j : (secondSize[1] + 1)*j]
+            blockAngles = angles[secondSize[0]*i : (secondSize[0] + 1)*i, secondSize[1]*j : (secondSize[1] + 1)*j]
+            blockVec = create_block_HOG_vector(blockMags, blockAngles)
+            secondBlockVecs[i, j] = blockVec
+
+    # TODO: Add normalization to the feature vector
+    # For normalization of 8x8 blocks, use sliding window of 2 blocks by 2 blocks. 
     return vec

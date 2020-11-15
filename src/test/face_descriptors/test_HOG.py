@@ -5,9 +5,18 @@ from ...face_descriptors import HOG
 # =================== Testing Compute Gradient Function ===================
 
 def test_compute_gradient_grayscale():
-    img = np.array([[3, 2, 1], [3, 2, 1], [3, 2, 1]])
-    expectedMag = np.array([[0, 2/255.0, 0],[0, 2/255.0, 0],[0, 2/255.0, 0]])
-    expectedAngle = np.array([[0, 0, 0],[0, 0, 0],[0, 0, 0]])
+    img = np.array([[3, 2, 1],
+                    [3, 2, 1],
+                    [3, 2, 1]])
+
+    expectedMag = np.array([[0, 2, 0],
+                            [0, 2, 0],
+                            [0, 2, 0]])
+
+    expectedAngle = np.array([[0, 0, 0],
+                              [0, 0, 0],
+                              [0, 0, 0]])
+
     out = HOG.compute_gradients(img)
     # Since magnitudes are floats here, require isclose to test if theyre similar
     # And check that every element in the array is similar enough
@@ -19,16 +28,16 @@ def test_compute_gradient_colored():
                     [[1, 2, 3], [2, 2, 2], [3, 2, 1]],
                     [[1, 2, 3], [2, 2, 2], [3, 2, 1]]])
     
-    expectedMag = np.array([[0, 2/255.0, 0],
-                            [0, 2/255.0, 0],
-                            [0, 2/255.0, 0]])
+    expectedMag = np.array([[0, 2, 0],
+                            [0, 2, 0],
+                            [0, 2, 0]])
     
     expectedAngle = np.array([[0, 0, 0],
                               [0, 0, 0],
                               [0, 0, 0]])
     
     out = HOG.compute_gradients(img)
-    
+
     assert (np.isclose(out[0], expectedMag).sum() == img.shape[0]*img.shape[1]) and np.array_equal(out[1], expectedAngle)
 
 # =================== Testing Block Vector Creator Function ===================
@@ -49,3 +58,10 @@ def test_block_histogram_creator():
 
 def test_block_histogram_creator_on_empty_input():
     assert np.array_equal(np.zeros(9), HOG.create_block_HOG_vector(np.array([]), np.array([])))
+
+# =================== Testing Overall HOG Feature Vector Function ===================
+
+def test_HOG_vector_on_black_image():
+    image = np.zeros((64, 64, 3))
+    expectedOut = np.zeros(2880)
+    assert np.array_equal(expectedOut, HOG.get_HOG_feature_vector(image))
