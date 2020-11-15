@@ -96,8 +96,8 @@ def get_HOG_feature_vector(img):
     # firstBlockVecs = np.zeros((16, 16, 9))
     for i in range(0, 16):
         for j in range(0, 16):
-            blockMags = magnitudes[firstSize[0]*i : (firstSize[0] + 1)*i, firstSize[1]*j : (firstSize[1] + 1)*j]
-            blockAngles = angles[firstSize[0]*i : (firstSize[0] + 1)*i, firstSize[1]*j : (firstSize[1] + 1)*j]
+            blockMags = magnitudes[firstSize[0]*i : firstSize[0]*(i + 1), firstSize[1]*j : firstSize[1]*(j + 1)]
+            blockAngles = angles[firstSize[0]*i : firstSize[0]*(i + 1), firstSize[1]*j : firstSize[1]*(j + 1)]
             blockVec = create_block_HOG_vector(blockMags, blockAngles)
             vec = np.append(vec, blockVec)
             # firstBlockVecs[i, j] = blockVec
@@ -107,8 +107,8 @@ def get_HOG_feature_vector(img):
     secondBlockVecs = np.zeros((8, 8, 9))
     for i in range(0, 8):
         for j in range(0, 8):
-            blockMags = magnitudes[secondSize[0]*i : (secondSize[0] + 1)*i, secondSize[1]*j : (secondSize[1] + 1)*j]
-            blockAngles = angles[secondSize[0]*i : (secondSize[0] + 1)*i, secondSize[1]*j : (secondSize[1] + 1)*j]
+            blockMags = magnitudes[secondSize[0]*i : secondSize[0]*(i + 1), secondSize[1]*j : secondSize[1]*(j+1)]
+            blockAngles = angles[secondSize[0]*i : secondSize[0]*(i + 1), secondSize[1]*j : secondSize[1]*(j+1)]
             blockVec = create_block_HOG_vector(blockMags, blockAngles)
             vec = np.append(vec, blockVec)
             # secondBlockVecs[i, j] = blockVec

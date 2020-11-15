@@ -68,7 +68,7 @@ def test_L2_norm_on_zero_vector():
 
 def test_L2_norm_on_standard_vector():
     vec = np.array([3, 4])
-    expectedNorm = np.array([3/sqrt(25 + 0.0001), 4/sqrt(25 + 0.0001)])
+    expectedNorm = np.array([3/sqrt(25 + 0.0001), 4/sqrt(25 + 0.0001    )])
     assert np.array_equal(HOG.L2_norm_normalization(vec), expectedNorm)
 
 # =================== Testing Overall HOG Feature Vector Function ===================
@@ -77,3 +77,21 @@ def test_HOG_vector_on_black_image():
     image = np.zeros((64, 64, 3))
     expectedOut = np.zeros(2880)
     assert np.array_equal(expectedOut, HOG.get_HOG_feature_vector(image))
+
+def test_HOG_vector_on_some_inputs():
+    sliceOfImg = np.array([[[1, 2, 3], [2, 2, 2]],
+                           [[1, 2, 3], [2, 2, 2]]])
+    img = np.zeros((64, 64, 3))
+    img[:sliceOfImg.shape[0], :sliceOfImg.shape[1], :sliceOfImg.shape[2]] = sliceOfImg
+    expectedOut = np.float32(np.zeros(9*(256+64)))
+    expectedOut[0] = 7.0
+    expectedOut[3] = 2.98667816705 # Calculated by hand with help from the gradient function
+    expectedOut[4] = 4 + 0.61887303294
+    expectedOut[5] = 4.0
+    expectedOut[9*16*16] = 7.0
+    expectedOut[9*16*16 + 3] = 2.98667816705 
+    expectedOut[9*16*16 + 4] = 4 + 0.61887303294
+    expectedOut[9*16*16 + 5] = 4.0
+    out = HOG.get_HOG_feature_vector(img)
+    assert np.isclose(out, expectedOut).sum() == 2880
+    
