@@ -64,3 +64,34 @@ def test_difference_of_gaussians_on_3_black_images():
     octave = np.zeros((3, 64, 64))
     expectedOctave = np.zeros((2, 64, 64))
     assert np.array_equal(SIFT.difference_of_gaussians(octave), expectedOctave)
+
+# ================= Testing Getting Local Maxima and Minima ==================
+
+
+def test_getting_maxima_and_minima_when_input_has_none():
+    DoG = np.zeros((4, 64, 64))
+    DoG[2, 2, 2] = 10
+    DoG[2, 3, 2] = 10
+    DoG[1, 1, 1] = -10
+    DoG[2, 1, 1] = -10
+    expectedOut = (np.zeros((0, 3)), np.zeros((0, 3)))
+    assert np.array_equal(SIFT.get_max_and_min_of_DoG(DoG), expectedOut)
+
+
+def test_getting_maxima_and_minima_when_input_has_one_of_each():
+    DoG = np.zeros((4, 64, 64))
+    DoG[2, 2, 2] = 10
+    DoG[1, 1, 1] = -10
+    expectedOut = (np.array([[1, 1, 1]]), np.array([[2, 2, 2]]))
+    assert np.array_equal(SIFT.get_max_and_min_of_DoG(DoG), expectedOut)
+
+
+def test_getting_maxima_and_minima_when_input_has_multiple_of_each():
+    DoG = np.zeros((4, 64, 64))
+    DoG[2, 2, 2] = 10
+    DoG[2, 7, 8] = 100
+    DoG[1, 1, 1] = -10
+    DoG[1, 4, 6] = -100
+    expectedOut = (np.array([[1, 1, 1], [1, 4, 6]]),
+                   np.array([[2, 2, 2], [2, 7, 8]]))
+    assert np.array_equal(SIFT.get_max_and_min_of_DoG(DoG), expectedOut)
