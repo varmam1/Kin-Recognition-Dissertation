@@ -113,3 +113,31 @@ def get_max_and_min_of_DoG(DoG):
     minCoords = np.asarray(np.where(DoG < filteredMin)).T
     maxCoords = np.asarray(np.where(DoG > filteredMax)).T
     return (minCoords, maxCoords)
+
+
+def find_subpixel_maxima_and_minima(DoG, extrema):
+    """
+    Given the Difference of Gaussians and the local extrema in the DoG, finds
+    the subpixel extrema to get a more accurate keypoint.
+
+    Keyword Arguments:
+    - DoG (np.array) : The difference of Gaussians for an octave.
+    - extrema (np.array) : The coordinates in the DoG of the extrema.
+
+    Returns:
+    - A np array of the coordinates of the more accurate keypoints
+    """ 
+    subpixelExtrema = np.array([])
+    hessian = get_hessian(DoG)
+    gradients = np.gradient(DoG)
+    for coordinate in extrema:
+        hess = DoG[coordinate]
+        grad_vector = np.array([])
+        for grad_i in gradients:
+            grad_vector = np.append(grad_vector, [grad_i[coordinate]])
+        x_hat = - np.dot(np.linalg.inv(hess), grad_vector)
+        subpixelExtrema = np.append(subpixelExtrema, x_hat)
+    return subpixelExtrema
+
+
+# TODO: Required to remove low contrast keypoints and then edge keypoints.
