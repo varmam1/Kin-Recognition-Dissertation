@@ -8,8 +8,12 @@ from math import sqrt
 # sliding window of 2 cells by 2 cells to create 7x7 patches with which you
 # get a 128 dimensional vector from each patch.
 
+#########################
+# Scale Space Functions #
+#########################
 
-def get_octaves_and_blurring(img, num_octaves=4, num_blurs=5, sigma=sqrt(2)):
+
+def get_octaves_and_blurring(img, num_octaves=4, num_blurs=5, sigma=1.6, k=sqrt(2)):
     """
     Given a grayscaled image and the number of octaves and how many images
     should be in each octave, returns a dictionary of the octaves. The value
@@ -33,7 +37,8 @@ def get_octaves_and_blurring(img, num_octaves=4, num_blurs=5, sigma=sqrt(2)):
         octave[0] = cv2.resize(img, size, interpolation=cv2.INTER_AREA)
         for j in range(1, num_blurs):
             octave[j] = cv2.GaussianBlur(octave[j - 1], (0, 0),
-                                         sigmaX=sigma**j, sigmaY=sigma**j)
+                                         sigmaX=sigma*(k**j),
+                                         sigmaY=sigma*(k**j))
         size = (int(size[0]/2), int(size[1]/2))
         octaves[i + 1] = octave
 
@@ -57,6 +62,32 @@ def difference_of_gaussians(octave):
     for i in range(1, octave.shape[0]):
         DoG[i - 1] = octave[i] - octave[i - 1]
     return DoG
+
+################################
+# Keypoint Selection Functions #
+################################
+
+
+def get_hessian(diff_of_gauss):
+    """
+    Given a difference of Gaussians, returns the Hessian matrix for each point
+    in the difference of Gaussians.
+
+    Keyword Arguments:
+    - diff_of_gauss (np.array): Difference of Gaussians of size (blurs, w, h)
+
+    Returns:
+    - An np.array of size (blurs, w, h, 3, 3) which is the Hessian Matrix at
+    each element of the DoG.
+    """
+    first_order_gradient = np.gradient(diff_of_gauss)
+    hessian = np.empty(diff_of_gauss.shape + (diff_of_gauss.ndim,
+                                              diff_of_gauss.ndim), dtype=diff_of_gauss.dtype)
+    for x, gradient_x in enumerate(first_order_gradient):
+        second_grad_wrt_x = np.gradient(gradient_x)
+        for y, grad_x_y in enumerate(second_grad_wrt_x):
+            hessian[:, :, :, x, y] = grad_x_y
+    return hessian
 
 
 def get_max_and_min_of_DoG(DoG):

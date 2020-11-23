@@ -65,6 +65,29 @@ def test_difference_of_gaussians_on_3_black_images():
     expectedOctave = np.zeros((2, 64, 64))
     assert np.array_equal(SIFT.difference_of_gaussians(octave), expectedOctave)
 
+# ======================= Testing Getting the Hessian ========================
+
+
+def test_getting_hessian_of_constant_array():
+    dog = np.ones((3, 64, 64))
+    expectedOut = np.zeros((3, 64, 64, 3, 3))
+    assert np.array_equal(SIFT.get_hessian(dog), expectedOut)
+
+
+def test_getting_hessian_of_array_():
+    dog = np.fromfunction(lambda x, y, z: z**2, (3, 10, 10), dtype=int)
+    expectedOut = np.zeros((3, 10, 10, 3, 3))
+    for i in range(3):
+        for j in range(10):
+            for k in range(10):
+                hess = np.zeros((3, 3))
+                if k - 2 < 0 or k + 2 >= 10:
+                    hess[2, 2] = 1
+                else:
+                    hess[2, 2] = 2
+                expectedOut[i, j, k] = hess
+    assert np.isclose(SIFT.get_hessian(dog), expectedOut).all()
+
 # ================= Testing Getting Local Maxima and Minima ==================
 
 
