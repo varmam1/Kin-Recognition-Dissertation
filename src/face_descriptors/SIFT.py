@@ -139,7 +139,7 @@ def find_subpixel_maxima_and_minima(DoG, extrema):
         outsideImage = False
         for dummy in range(MAX_ITERATIONS):
             # Calculate the subpixel keypoint via Taylor Expansion
-            hess = DoG[new_coords]
+            hess = hessian[new_coords]
             grad_vector = np.array([])
             for grad_i in gradients:
                 grad_vector = np.append(grad_vector, [grad_i[new_coords]])
