@@ -8,6 +8,9 @@ from math import sqrt
 # sliding window of 2 cells by 2 cells to create 7x7 patches with which you
 # get a 128 dimensional vector from each patch.
 
+MAX_PIXEL_VALUE = 255
+MAX_ITERATIONS = 1000
+
 #########################
 # Scale Space Functions #
 #########################
@@ -131,13 +134,38 @@ def find_subpixel_maxima_and_minima(DoG, extrema):
     hessian = get_hessian(DoG)
     gradients = np.gradient(DoG)
     for coordinate in extrema:
-        hess = DoG[coordinate]
-        grad_vector = np.array([])
-        for grad_i in gradients:
-            grad_vector = np.append(grad_vector, [grad_i[coordinate]])
-        x_hat = - np.dot(np.linalg.inv(hess), grad_vector)
-        subpixelExtrema = np.append(subpixelExtrema, x_hat)
+        new_coords = coordinate
+        x_hat = np.zeros(DoG.ndim)
+        outsideImage = False
+        for dummy in range(MAX_ITERATIONS):
+            # Calculate the subpixel keypoint via Taylor Expansion
+            hess = DoG[new_coords]
+            grad_vector = np.array([])
+            for grad_i in gradients:
+                grad_vector = np.append(grad_vector, [grad_i[new_coords]])
+            x_hat = - np.dot(np.linalg.inv(hess), grad_vector)
+
+            if (x_hat - 0.5 <= 0).all():
+                # If the offset is less than 0.5 in all dims then this is the
+                # subpixel keypoint you want. 
+                break
+            new_coords = np.around(new_coords + x_hat).astype(int)
+
+            # If the new coordinates are outside the DoG, give up. 
+            if (new_coords < 0).any() or (new_coords >= np.array(DoG.shape())).any():
+                outsideImage = True
+                break
+        
+        # If iterated more than the max amount of times, give up and move on. 
+        if dummy >= MAX_ITERATIONS or outsideImage:
+            continue
+
+        # Check what the value at x_hat is and if it's too small, throw it out
+        val_at_x_hat = DoG[coordinate] + 0.5 * np.dot(grad_vector, x_hat)
+        if abs(val_at_x_hat) >= 0.03 * MAX_PIXEL_VALUE:
+            subpixelExtrema = np.append(subpixelExtrema, x_hat)
+        
     return subpixelExtrema
 
 
-# TODO: Required to remove low contrast keypoints and then edge keypoints.
+# TODO: Required to remove edge keypoints.
