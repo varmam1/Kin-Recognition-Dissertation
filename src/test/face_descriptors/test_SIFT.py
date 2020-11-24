@@ -118,3 +118,36 @@ def test_getting_maxima_and_minima_when_input_has_multiple_of_each():
     expectedOut = (np.array([[1, 1, 1], [1, 4, 6]]),
                    np.array([[2, 2, 2], [2, 7, 8]]))
     assert np.array_equal(SIFT.get_max_and_min_of_DoG(DoG), expectedOut)
+
+
+# ===================== Testing Subpixel Extrema Function ====================
+
+
+def test_getting_subpixel_extrema_when_extrema_on_pixel():
+    diff_of_gauss = np.zeros((3, 10, 10))
+    diff_of_gauss[1, 5, 5] = 100
+    for i in range(-1, 2):
+        for j in range(-1, 2):
+            for k in range(-1, 2):
+                if i != 0 or j != 0 or k != 0:
+                    diff_of_gauss[i + 1, j + 5, k + 5] = 50
+    out = SIFT.find_subpixel_maxima_and_minima(
+        diff_of_gauss, np.array([[1, 5, 5]]))
+    expectedOut = np.array([])
+    assert np.array_equal(out, expectedOut)
+
+
+# ================= Testing Deleting Edge Responses Function =================
+
+
+def test_deleting_edge_responses_when_no_edges():
+    diff_of_gauss = np.zeros((3, 10, 10))
+    diff_of_gauss[1, 5, 5] = 100
+    for i in range(-1, 2):
+        for j in range(-1, 2):
+            for k in range(-1, 2):
+                if i != 0 or j != 0 or k != 0:
+                    diff_of_gauss[i + 1, j + 5, k + 5] = 50
+    out = SIFT.remove_edge_responses(diff_of_gauss, np.array([[1, 5, 5]]))
+    expectedOut = np.array([[1, 5, 5]])
+    assert np.array_equal(out, expectedOut)

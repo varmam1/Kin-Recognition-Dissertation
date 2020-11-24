@@ -77,7 +77,8 @@ def get_hessian(diff_of_gauss):
     in the difference of Gaussians.
 
     Keyword Arguments:
-    - diff_of_gauss (np.array): Difference of Gaussians of size (blurs, w, h)
+    - diff_of_gauss (np.array): Difference of Gaussians for an octave of size
+                                (blurs, w, h)
 
     Returns:
     - An np.array of size (blurs, w, h, 3, 3) which is the Hessian Matrix at
@@ -129,8 +130,8 @@ def find_subpixel_maxima_and_minima(DoG, extrema):
 
     Returns:
     - A np array of the coordinates of the more accurate keypoints
-    """ 
-    subpixelExtrema = np.array([])
+    """
+    subpixelExtrema = []
     hessian = get_hessian(DoG)
     gradients = np.gradient(DoG)
     for coordinate in extrema:
@@ -139,33 +140,65 @@ def find_subpixel_maxima_and_minima(DoG, extrema):
         outsideImage = False
         for dummy in range(MAX_ITERATIONS):
             # Calculate the subpixel keypoint via Taylor Expansion
-            hess = hessian[new_coords]
+            hess = hessian[new_coords[0], new_coords[1], new_coords[2]]
             grad_vector = np.array([])
             for grad_i in gradients:
-                grad_vector = np.append(grad_vector, [grad_i[new_coords]])
+                grad_vector = np.append(
+                    grad_vector, [grad_i[new_coords[0], new_coords[1], new_coords[2]]])
+            if np.array_equal(grad_vector, np.zeros(3)):
+                break
             x_hat = - np.dot(np.linalg.inv(hess), grad_vector)
-
             if (x_hat - 0.5 <= 0).all():
                 # If the offset is less than 0.5 in all dims then this is the
-                # subpixel keypoint you want. 
+                # subpixel keypoint you want.
                 break
             new_coords = np.around(new_coords + x_hat).astype(int)
 
-            # If the new coordinates are outside the DoG, give up. 
+            # If the new coordinates are outside the DoG, give up.
             if (new_coords < 0).any() or (new_coords >= np.array(DoG.shape())).any():
                 outsideImage = True
                 break
-        
-        # If iterated more than the max amount of times, give up and move on. 
+
+        # If iterated more than the max amount of times, give up and move on.
         if dummy >= MAX_ITERATIONS or outsideImage:
             continue
 
         # Check what the value at x_hat is and if it's too small, throw it out
-        val_at_x_hat = DoG[coordinate] + 0.5 * np.dot(grad_vector, x_hat)
+        val_at_x_hat = DoG[coordinate[0], coordinate[1],
+                           coordinate[2]] + 0.5 * np.dot(grad_vector, x_hat)
+        if np.array_equal(np.zeros(3), x_hat):
+            continue
+
         if abs(val_at_x_hat) >= 0.03 * MAX_PIXEL_VALUE:
-            subpixelExtrema = np.append(subpixelExtrema, x_hat)
-        
-    return subpixelExtrema
+            subpixelExtrema.append(x_hat)
+
+    return np.array(subpixelExtrema)
 
 
-# TODO: Required to remove edge keypoints.
+def remove_edge_responses(diff_of_gauss, keypoints):
+    """
+    Given the difference of Gaussians and the potential keypoints, deletes any
+    keypoints that are edges.
+
+    Keyword Arguments:
+    - diff_of_gauss (np.array): The difference of Gaussians for an octave.
+    - keypoints (np.array) : The coordinates in the DoG of the potential
+                             keypoints
+
+    Returns:
+    - The coordinates of the keypoints that weren't edges.
+    """
+    hessian = get_hessian(diff_of_gauss)
+    nonEdgeKeypoints = []
+    for subCoords in keypoints:
+        nearestIntKeypoint = np.around(subCoords).astype(int)
+        # Only want the hessian for x and y, not sigma
+        hess = hessian[nearestIntKeypoint[0],
+                       nearestIntKeypoint[1], nearestIntKeypoint[2], 1:, 1:]
+        determinant = np.linalg.det(hess)
+        trace = np.trace(hess)
+        ratio_of_eigenvalues = 10
+        threshold = ((ratio_of_eigenvalues + 1)**2)/ratio_of_eigenvalues
+        if (trace**2)/determinant < threshold:
+            nonEdgeKeypoints.append(subCoords)
+    return np.array(nonEdgeKeypoints)
