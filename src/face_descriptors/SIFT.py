@@ -136,8 +136,9 @@ def find_subpixel_maxima_and_minima(DoG, extrema):
     gradients = np.gradient(DoG)
     for coordinate in extrema:
         new_coords = coordinate
-        x_hat = np.zeros(DoG.ndim)
+        offset = np.zeros(DoG.ndim)
         outsideImage = False
+        subpixel_keypoint = coordinate
         for dummy in range(MAX_ITERATIONS):
             # Calculate the subpixel keypoint via Taylor Expansion
             hess = hessian[new_coords[0], new_coords[1], new_coords[2]]
@@ -147,30 +148,30 @@ def find_subpixel_maxima_and_minima(DoG, extrema):
                     grad_vector, [grad_i[new_coords[0], new_coords[1], new_coords[2]]])
             if np.array_equal(grad_vector, np.zeros(3)):
                 break
-            x_hat = - np.dot(np.linalg.inv(hess), grad_vector)
-            if (x_hat - 0.5 <= 0).all():
+            offset = - np.dot(np.linalg.inv(hess), grad_vector)
+            if (offset - 0.5 <= 0).all():
                 # If the offset is less than 0.5 in all dims then this is the
                 # subpixel keypoint you want.
+                subpixel_keypoint = new_coords + offset
                 break
-            new_coords = np.around(new_coords + x_hat).astype(int)
+            new_coords = np.around(new_coords + offset).astype(int)
 
             # If the new coordinates are outside the DoG, give up.
             if (new_coords < 0).any() or (new_coords >= np.array(DoG.shape())).any():
                 outsideImage = True
                 break
-
+            
         # If iterated more than the max amount of times, give up and move on.
         if dummy >= MAX_ITERATIONS or outsideImage:
             continue
 
-        # Check what the value at x_hat is and if it's too small, throw it out
-        val_at_x_hat = DoG[coordinate[0], coordinate[1],
-                           coordinate[2]] + 0.5 * np.dot(grad_vector, x_hat)
-        if np.array_equal(np.zeros(3), x_hat):
-            continue
+        # Check what the value at subPixelCoord is is and if it's too small,
+        # throw it out
+        val_at_subpixel_coord = DoG[coordinate[0], coordinate[1],
+                           coordinate[2]] + 0.5 * np.dot(grad_vector, subpixel_keypoint)
 
-        if abs(val_at_x_hat) >= 0.03 * MAX_PIXEL_VALUE:
-            subpixelExtrema.append(x_hat)
+        if abs(val_at_subpixel_coord) >= 0.03 * MAX_PIXEL_VALUE:
+            subpixelExtrema.append(subpixel_keypoint)
 
     return np.array(subpixelExtrema)
 
@@ -196,6 +197,8 @@ def remove_edge_responses(diff_of_gauss, keypoints):
         hess = hessian[nearestIntKeypoint[0],
                        nearestIntKeypoint[1], nearestIntKeypoint[2], 1:, 1:]
         determinant = np.linalg.det(hess)
+        if determinant < 0:
+            continue
         trace = np.trace(hess)
         ratio_of_eigenvalues = 10
         threshold = ((ratio_of_eigenvalues + 1)**2)/ratio_of_eigenvalues

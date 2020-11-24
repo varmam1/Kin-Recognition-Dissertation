@@ -133,7 +133,7 @@ def test_getting_subpixel_extrema_when_extrema_on_pixel():
                     diff_of_gauss[i + 1, j + 5, k + 5] = 50
     out = SIFT.find_subpixel_maxima_and_minima(
         diff_of_gauss, np.array([[1, 5, 5]]))
-    expectedOut = np.array([])
+    expectedOut = np.array([[1, 5, 5]])
     assert np.array_equal(out, expectedOut)
 
 
