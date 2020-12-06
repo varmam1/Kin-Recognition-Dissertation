@@ -159,9 +159,18 @@ def test_deleting_edge_responses_when_no_edges():
 def test_getting_orientations_of_keypoint_with_90_orientation():
     DoG = np.zeros((3, 3, 3))
     DoG[1] = np.array([[0, -1, 0],
-                       [0, 0, 0],
-                       [0, 1, 0]])
+                       [0,  0, 0],
+                       [0,  1, 0]])
     keypoint = np.array([[1, 1, 1]])
     expectedOut = {0: np.array([90])}
     assert expectedOut == SIFT.get_orientations_for_keypoint(DoG, keypoint)
 
+
+def test_getting_orientations_of_keypoint_with_more_than_one_orientation():
+    DoG = np.zeros((3, 3, 3))
+    DoG[1] = np.array([[ 1, -1, 0],
+                       [ 0,  0, 0],
+                       [-1,  1, 0]])
+    keypoint = np.array([[1, 1, 1]])
+    expectedOutArr = np.array([90, 270])
+    assert np.array_equal(expectedOutArr, SIFT.get_orientations_for_keypoint(DoG, keypoint)[0])
