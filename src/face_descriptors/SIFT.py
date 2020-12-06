@@ -129,7 +129,7 @@ def find_subpixel_maxima_and_minima(DoG, extrema):
     - extrema (np.array) : The coordinates in the DoG of the extrema.
 
     Returns:
-    - A np array of the coordinates of the more accurate keypoints
+    - A np array of the coordinates of the more accurate keypoints (floats)
     """
     subpixelExtrema = []
     hessian = get_hessian(DoG)
@@ -205,3 +205,68 @@ def remove_edge_responses(diff_of_gauss, keypoints):
         if (trace**2)/determinant < threshold:
             nonEdgeKeypoints.append(subCoords)
     return np.array(nonEdgeKeypoints)
+
+#################################
+# Keypoint Descriptor Functions #
+#################################
+
+def create_histogram_for_keypoint(diff_of_gauss, keypoints, sigma=1.6, k=sqrt(2)):
+    """
+
+    Keyword Arguments:
+    - diff_of_gauss:
+    - keypoints:
+    - sigma: The original sigma used to create the blurs
+
+    Returns:
+    -
+    """
+    mapOfKeypointsToOrientation = {}
+    for keypoint in keypoints:
+        nearestIntKeypoint = np.around(keypoint).astype(int)
+        scaledImg = diff_of_gauss[nearestIntKeypoint[0]]
+        diffXKernel = np.array([[ 0, 0, 0],
+                                [-1, 0, 1],
+                                [ 0, 0, 0]])
+        diffYKernel = np.transpose(diffXKernel)
+        diffX = cv2.filter2D(scaledImg, -1, diffXKernel)
+        diffY = cv2.filter2D(scaledImg, -1, diffYKernel)
+        magnitude, angle = cv2.cartToPolar(diffX, diffY, angleInDegrees=True)
+        # Assumption that keypoint isn't ever going to be on 0th blur level
+        sizeOfCircularWindow = round(sigma * 1.5 * (k**nearestIntKeypoint[0]))
+        anglesArea = angle[max(0, nearestIntKeypoint[1] - int(sizeOfCircularWindow/2)):min(diff_of_gauss.shape[1] - 1, nearestIntKeypoint[1] + int(sizeOfCircularWindow/2)),
+                            max(0, nearestIntKeypoint[2] - int(sizeOfCircularWindow/2)):min(diff_of_gauss.shape[2] - 1, nearestIntKeypoint[2] + int(sizeOfCircularWindow/2))]
+        magnitudeArea = magnitude[max(0, nearestIntKeypoint[1] - int(sizeOfCircularWindow/2)):min(diff_of_gauss.shape[1] - 1, nearestIntKeypoint[1] + int(sizeOfCircularWindow/2)),
+                                max(0, nearestIntKeypoint[2] - int(sizeOfCircularWindow/2)):min(diff_of_gauss.shape[2] - 1, nearestIntKeypoint[2] + int(sizeOfCircularWindow/2))]
+        
+        # TODO: Gaussian multiply with the magnitude
+        vec = np.zeros(36)
+
+        # For each cell, divide angle by 10 to find out cell it's in
+        bins = anglesArea/10
+
+        # Create the amount they weigh towards the lower bin and the upper bin.
+        # If a value is an integer, its fully under weightsTowardsLower. So if a
+        # value of an element is 2, then the corresponding values are 1 and 0.
+
+        weightsTowardsLower = (10*(np.floor(bins)+1)-anglesArea)/10
+
+        addToLowerBins = magnitudeArea*weightsTowardsLower
+        addToUpperBins = magnitudeArea - addToLowerBins
+
+        lowerBins = np.uint8(np.floor(bins))
+        upperBins = np.uint8(np.ceil(bins) % 36)
+
+        np.add.at(vec, lowerBins, addToLowerBins)
+        np.add.at(vec, upperBins, addToUpperBins)
+
+        #TODO: Get the top value and then if theres something in the 80% or more of that, that too
+
+        indexWithMost = np.argmax(vec)
+        moreThan80 = vec >= 0.8*vec[indexWithMost]
+        arrOfOrientations = []
+        for i in range(0, len(vec)):
+            if moreThan80[i]:
+                arrOfOrientations.append(i*10)
+        mapOfKeypointsToOrientation[keypoint] = np.array(arrOfOrientations)
+    return mapOfKeypointsToOrientation
