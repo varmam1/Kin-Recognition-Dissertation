@@ -210,19 +210,25 @@ def remove_edge_responses(diff_of_gauss, keypoints):
 # Keypoint Descriptor Functions #
 #################################
 
-def create_histogram_for_keypoint(diff_of_gauss, keypoints, sigma=1.6, k=sqrt(2)):
+def get_orientations_for_keypoint(diff_of_gauss, keypoints, sigma=1.6, k=sqrt(2)):
     """
+    Given the difference of Gaussians and keypoints, will return the
+    orientations for each keypoint as a map.
 
     Keyword Arguments:
-    - diff_of_gauss:
-    - keypoints:
+    - diff_of_gauss: The difference of Gaussians
+    - keypoints: A list of the coordinates of the keypoints.
     - sigma: The original sigma used to create the blurs
+    - k: The original k used to create the blurs
 
     Returns:
-    -
+    - A map (int -> np.array) of the index of the keypoint to their
+      orientations. The index represents the index of the keypoint in the
+      original array.
     """
     mapOfKeypointsToOrientation = {}
-    for keypoint in keypoints:
+    for i in range(len(keypoints)):
+        keypoint = keypoints[i]
         nearestIntKeypoint = np.around(keypoint).astype(int)
         scaledImg = diff_of_gauss[nearestIntKeypoint[0]]
         diffXKernel = np.array([[ 0, 0, 0],
@@ -234,14 +240,16 @@ def create_histogram_for_keypoint(diff_of_gauss, keypoints, sigma=1.6, k=sqrt(2)
         magnitude, angle = cv2.cartToPolar(diffX, diffY, angleInDegrees=True)
         # Assumption that keypoint isn't ever going to be on 0th blur level
         sizeOfCircularWindow = round(sigma * 1.5 * (k**nearestIntKeypoint[0]))
-        anglesArea = angle[max(0, nearestIntKeypoint[1] - int(sizeOfCircularWindow/2)):min(diff_of_gauss.shape[1] - 1, nearestIntKeypoint[1] + int(sizeOfCircularWindow/2)),
-                            max(0, nearestIntKeypoint[2] - int(sizeOfCircularWindow/2)):min(diff_of_gauss.shape[2] - 1, nearestIntKeypoint[2] + int(sizeOfCircularWindow/2))]
-        magnitudeArea = magnitude[max(0, nearestIntKeypoint[1] - int(sizeOfCircularWindow/2)):min(diff_of_gauss.shape[1] - 1, nearestIntKeypoint[1] + int(sizeOfCircularWindow/2)),
-                                max(0, nearestIntKeypoint[2] - int(sizeOfCircularWindow/2)):min(diff_of_gauss.shape[2] - 1, nearestIntKeypoint[2] + int(sizeOfCircularWindow/2))]
-        
-        # TODO: Gaussian multiply with the magnitude
-        vec = np.zeros(36)
+        anglesArea = angle[max(0, nearestIntKeypoint[1] - int(sizeOfCircularWindow/2)):min(diff_of_gauss.shape[1], nearestIntKeypoint[1] + int(sizeOfCircularWindow/2) + 1),
+                            max(0, nearestIntKeypoint[2] - int(sizeOfCircularWindow/2)):min(diff_of_gauss.shape[2], nearestIntKeypoint[2] + int(sizeOfCircularWindow/2) + 1)]
+        magnitudeArea = magnitude[max(0, nearestIntKeypoint[1] - int(sizeOfCircularWindow/2)):min(diff_of_gauss.shape[1], nearestIntKeypoint[1] + int(sizeOfCircularWindow/2) + 1),
+                                max(0, nearestIntKeypoint[2] - int(sizeOfCircularWindow/2)):min(diff_of_gauss.shape[2], nearestIntKeypoint[2] + int(sizeOfCircularWindow/2) + 1)]
 
+        magnitudeArea = np.multiply(magnitudeArea, cv2.GaussianBlur(magnitudeArea, (0, 0),
+                                        sigmaX=1.5 * sigma*(k**nearestIntKeypoint[0]),
+                                        sigmaY=1.5 * sigma*(k**nearestIntKeypoint[0])))
+        vec = np.zeros(36)
+        
         # For each cell, divide angle by 10 to find out cell it's in
         bins = anglesArea/10
 
@@ -260,13 +268,11 @@ def create_histogram_for_keypoint(diff_of_gauss, keypoints, sigma=1.6, k=sqrt(2)
         np.add.at(vec, lowerBins, addToLowerBins)
         np.add.at(vec, upperBins, addToUpperBins)
 
-        #TODO: Get the top value and then if theres something in the 80% or more of that, that too
-
         indexWithMost = np.argmax(vec)
         moreThan80 = vec >= 0.8*vec[indexWithMost]
         arrOfOrientations = []
-        for i in range(0, len(vec)):
-            if moreThan80[i]:
-                arrOfOrientations.append(i*10)
-        mapOfKeypointsToOrientation[keypoint] = np.array(arrOfOrientations)
+        for j in range(0, len(vec)):
+            if moreThan80[j]:
+                arrOfOrientations.append(j*10)
+        mapOfKeypointsToOrientation[i] = np.array(arrOfOrientations)
     return mapOfKeypointsToOrientation

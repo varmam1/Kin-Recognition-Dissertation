@@ -151,3 +151,17 @@ def test_deleting_edge_responses_when_no_edges():
     out = SIFT.remove_edge_responses(diff_of_gauss, np.array([[1, 5, 5]]))
     expectedOut = np.array([[1, 5, 5]])
     assert np.array_equal(out, expectedOut)
+
+
+# ================== Testing Getting Orientations Function ===================
+
+
+def test_getting_orientations_of_keypoint_with_90_orientation():
+    DoG = np.zeros((3, 3, 3))
+    DoG[1] = np.array([[0, -1, 0],
+                       [0, 0, 0],
+                       [0, 1, 0]])
+    keypoint = np.array([[1, 1, 1]])
+    expectedOut = {0: np.array([90])}
+    assert expectedOut == SIFT.get_orientations_for_keypoint(DoG, keypoint)
+
