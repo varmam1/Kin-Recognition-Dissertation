@@ -128,6 +128,9 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
+# Project
+.idea
+
 # TODO: Delete
 *.jpg
 !src/test/face_recognition/*.jpg

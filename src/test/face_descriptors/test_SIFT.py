@@ -174,3 +174,25 @@ def test_getting_orientations_of_keypoint_with_more_than_one_orientation():
     keypoint = np.array([[1, 1, 1]])
     expectedOutArr = np.array([90, 270])
     assert np.array_equal(expectedOutArr, SIFT.get_orientations_for_keypoint(DoG, keypoint)[0])
+
+
+# =============== Testing Paper SIFT Implementation Function =================
+
+
+def test_paper_SIFT_vector_on_empty_image():
+    img = np.zeros((64, 64, 3)).astype(np.uint8)
+    expectedVec = np.zeros(49*128)
+    assert np.array_equal(expectedVec, SIFT.paper_main_function_SIFT(img))
+
+
+def test_paper_SIFT_vector_on_image_with_values_in_top_left():
+    img = np.zeros((64, 64, 3)).astype(np.uint8)
+    img[0, 0:3] = np.array([[1, 1, 1], [0, 0, 0], [2, 2, 2]])
+    out = SIFT.paper_main_function_SIFT(img)
+    expectedVec = np.zeros(49*128)
+    expectedVec[0] = 1
+    expectedVec[6] = 1
+    expectedVec[12] = 2
+    expectedVec[14] = 2
+    expectedVec = expectedVec/np.linalg.norm(expectedVec)
+    assert np.isclose(expectedVec, out).all()

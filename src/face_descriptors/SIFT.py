@@ -276,3 +276,68 @@ def get_orientations_for_keypoint(diff_of_gauss, keypoints, sigma=1.6, k=sqrt(2)
                 arrOfOrientations.append(j*10)
         mapOfKeypointsToOrientation[i] = np.array(arrOfOrientations)
     return mapOfKeypointsToOrientation
+
+
+##################
+# Main Functions #
+##################
+
+
+def paper_main_function_SIFT(img):
+    """
+    Creates a SIFT face descriptor without finding the keypoints and just
+    getting the descriptors for each patch in the image.
+
+    Keyword Arguments:
+    - img: The face image that you want the SIFT vector for
+
+    Returns:
+    - A 6272 long vector for the face image if it is 64x64. 
+    """
+    gray_image = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    grid_square_size = (int(gray_image.shape[0]/16), int(gray_image.shape[1]/16))
+    number_of_squares_per_patch = (int((gray_image.shape[0]/8)/grid_square_size[0]),
+                                   int((gray_image.shape[1]/8)/grid_square_size[1]))
+    size_of_patch = (number_of_squares_per_patch[0]*grid_square_size[0],
+                     number_of_squares_per_patch[1]*grid_square_size[1])
+    vec = np.array([])
+    # For a 64 x 64, want to examine a 8x8 square and have the squares 4 apart.
+    for i in range(0, 7):
+        for j in range(0, 7):
+            vecForPatch = np.array([])
+            patch = gray_image[i*size_of_patch[0]:(i + 1)*size_of_patch[0],
+                               j*size_of_patch[1]:(j + 1)*size_of_patch[1]]
+            gx = cv2.Sobel(patch, cv2.CV_32F, 1, 0, ksize=1)
+            gy = cv2.Sobel(patch, cv2.CV_32F, 0, 1, ksize=1)
+            magnitude, angle = cv2.cartToPolar(gx, gy, angleInDegrees=True)
+            if i == 0 and j == 0:
+                print(patch)
+                print(magnitude)
+                print(angle)
+            size_of_small_square = (int(size_of_patch[0]/4), int(size_of_patch[1]/4))
+            # Break up patch into 4x4
+            for row in range(0, 4):
+                for col in range(0, 4):
+                    vecSquare = np.zeros(8)
+                    magSquare = magnitude[row*size_of_small_square[0]:(row+1)*size_of_small_square[0],
+                                          col*size_of_small_square[1]:(col+1)*size_of_small_square[1]]
+                    angleSquare = angle[row*size_of_small_square[0]:(row+1)*size_of_small_square[0],
+                                        col*size_of_small_square[1]:(col+1)*size_of_small_square[1]]
+                    bins = angleSquare/45
+                    weightsTowardsLower = (45*(np.floor(bins)+1)-angleSquare)/45
+
+                    addToLowerBins = magSquare*weightsTowardsLower
+                    addToUpperBins = magSquare - addToLowerBins
+
+                    lowerBins = np.uint8(np.floor(bins))
+                    upperBins = np.uint8(np.ceil(bins) % 8)
+
+                    np.add.at(vecSquare, lowerBins, addToLowerBins)
+                    np.add.at(vecSquare, upperBins, addToUpperBins)
+                    vecForPatch = np.append(vecForPatch, vecSquare)
+                    # TODO: Gaussian weighting function
+            norm = np.linalg.norm(vecForPatch)
+            if norm != 0: 
+                vecForPatch = vecForPatch / norm
+            vec = np.append(vec, vecForPatch)
+    return vec
