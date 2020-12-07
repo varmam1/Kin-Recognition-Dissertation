@@ -190,9 +190,10 @@ def test_paper_SIFT_vector_on_image_with_values_in_top_left():
     img[0, 0:3] = np.array([[1, 1, 1], [0, 0, 0], [2, 2, 2]])
     out = SIFT.paper_main_function_SIFT(img)
     expectedVec = np.zeros(49*128)
-    expectedVec[0] = 1
-    expectedVec[6] = 1
-    expectedVec[12] = 2
-    expectedVec[14] = 2
+    weighing = np.exp([-1, -1.5, -4])
+    expectedVec[0] = 1 * weighing[2]
+    expectedVec[6] = 1 * weighing[2]
+    expectedVec[12] = 2 * weighing[1]
+    expectedVec[14] = 2 * weighing[1]
     expectedVec = expectedVec/np.linalg.norm(expectedVec)
     assert np.isclose(expectedVec, out).all()

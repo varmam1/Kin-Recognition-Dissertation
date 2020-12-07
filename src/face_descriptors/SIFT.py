@@ -301,6 +301,13 @@ def paper_main_function_SIFT(img):
     size_of_patch = (number_of_squares_per_patch[0]*grid_square_size[0],
                      number_of_squares_per_patch[1]*grid_square_size[1])
     vec = np.array([])
+
+    # Gaussian weighing "function" based on how far the center of a square is
+    # from the center of the patch and with sigma = 1
+    # The constant in front is not here since the vector will be normalized so
+    # that provides nothing.
+    gaussian_weighing = np.exp([-1, -1.5, -4])
+
     # For a 64 x 64, want to examine a 8x8 square and have the squares 4 apart.
     for i in range(0, 7):
         for j in range(0, 7):
@@ -310,14 +317,11 @@ def paper_main_function_SIFT(img):
             gx = cv2.Sobel(patch, cv2.CV_32F, 1, 0, ksize=1)
             gy = cv2.Sobel(patch, cv2.CV_32F, 0, 1, ksize=1)
             magnitude, angle = cv2.cartToPolar(gx, gy, angleInDegrees=True)
-            if i == 0 and j == 0:
-                print(patch)
-                print(magnitude)
-                print(angle)
             size_of_small_square = (int(size_of_patch[0]/4), int(size_of_patch[1]/4))
             # Break up patch into 4x4
             for row in range(0, 4):
                 for col in range(0, 4):
+                    gaussian_weight = gaussian_weighing[int(np.abs(np.array([row, col]) - 1.5).sum()) - 1]
                     vecSquare = np.zeros(8)
                     magSquare = magnitude[row*size_of_small_square[0]:(row+1)*size_of_small_square[0],
                                           col*size_of_small_square[1]:(col+1)*size_of_small_square[1]]
@@ -325,6 +329,7 @@ def paper_main_function_SIFT(img):
                                         col*size_of_small_square[1]:(col+1)*size_of_small_square[1]]
                     bins = angleSquare/45
                     weightsTowardsLower = (45*(np.floor(bins)+1)-angleSquare)/45
+                    magSquare = gaussian_weight * magSquare
 
                     addToLowerBins = magSquare*weightsTowardsLower
                     addToUpperBins = magSquare - addToLowerBins
@@ -335,7 +340,6 @@ def paper_main_function_SIFT(img):
                     np.add.at(vecSquare, lowerBins, addToLowerBins)
                     np.add.at(vecSquare, upperBins, addToUpperBins)
                     vecForPatch = np.append(vecForPatch, vecSquare)
-                    # TODO: Gaussian weighting function
             norm = np.linalg.norm(vecForPatch)
             if norm != 0: 
                 vecForPatch = vecForPatch / norm
