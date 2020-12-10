@@ -46,9 +46,10 @@ def create_model(weights_path=None):
     model.add(Dense(4096, name='fc6'))
     model.add(Dense(4096, name='fc7'))
 
-    return model
+    if weights_path != None:
+        model.load_weights(weights_path)
 
-    
+    return model
 
 def get_VGG_face_descriptor(img, model):
     """
