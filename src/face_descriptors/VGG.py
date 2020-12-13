@@ -1,10 +1,20 @@
 import numpy as np
 import cv2
-from keras.layers import Flatten, Dense, Input, Activation, Conv2D, MaxPooling2D
-from keras.models import Sequential
+import tensorflow as tf
+from keras.layers import Flatten, Dense, Input, Activation, Conv2D, MaxPooling2D, Dropout
+from keras.models import Sequential, load_model
+from scipy.io import loadmat
+import urllib.request
+import tarfile
+import os
+import shutil
+
 
 # The file which will take a face and return the 4096-dimensional VGG vector
 # Using the VGG-Very-Deep-16 CNN architecture
+
+MATCONVNET_WEIGHTS_PATH="https://www.robots.ox.ac.uk/~vgg/software/vgg_face/src/vgg_face_matconvnet.tar.gz"
+
 
 def create_model(weights_path=None):
     """
@@ -43,13 +53,65 @@ def create_model(weights_path=None):
 
     # Face Descriptor Block
     model.add(Flatten(name='flatten'))
-    model.add(Dense(4096, name='fc6'))
-    model.add(Dense(4096, name='fc7'))
-
-    if weights_path != None:
-        model.load_weights(weights_path)
+    model.add(Dense(4096, activation='relu', name='fc6'))
+    model.add(Dropout(0.5))
+    model.add(Dense(4096, activation='relu', name='fc7'))
+    model.add(Dropout(0.5))
+    model.add(Dense(2622, activation='softmax', name='fc8'))
 
     return model
+    
+
+def save_weights_from_vgg_face_online():
+    """
+    Downloads the matconvnet weights from
+    https://www.robots.ox.ac.uk/~vgg/software/vgg_face/ and modifies it
+    slightly to match our model, saves the modified weights and deletes the
+    downloaded files.
+    """
+    # Downloads and loads the weights from the site
+    urllib.request.urlretrieve(MATCONVNET_WEIGHTS_PATH, 'vgg_face_matconvnet.tar.gz')
+    tar = tarfile.open("vgg_face_matconvnet.tar.gz", "r:gz")
+    tar.extractall("weights")
+    tar.close()
+    data = loadmat('weights/vgg_face_matconvnet/data/vgg_face.mat', matlab_compatible=False, struct_as_record=False)
+    net = data["net"][0][0]
+    ref_model_layers = net.layers[0]
+
+    # Creates the architecture that will be used
+    model = create_model()
+    layer_names = [layer.name for layer in model.layers]
+    num_of_ref_model_layers = ref_model_layers.shape[0]
+    
+    # For each layer, if it is a conv2D or fully-connected layer, applies the
+    # weights as required
+    for i in range(num_of_ref_model_layers):
+        ref_model_layer = ref_model_layers[i][0][0].name[0]
+        if ref_model_layer in layer_names:
+            if ref_model_layer.find("conv") == 0 or ref_model_layer.find("fc") == 0:
+                base_model_index = layer_names.index(ref_model_layer) 
+                weights = ref_model_layers[i][0][0].weights[0,0]
+                bias = ref_model_layers[i][0][0].weights[0,1]
+
+                # fc6 is of the form (7, 7, 512, 4096) originally but is
+                # required to be of the form (7*7*512, 4096) for this
+                if (ref_model_layer == "fc6"):
+                    weights = np.reshape(weights, (7*7*512, 4096))
+                
+                # The other fc layers are of the form (1, 1, 4096, x)
+                # and we need (4096, x)
+                elif (ref_model_layer.find("fc") == 0):
+                    weights = weights[0][0]
+
+                model.layers[base_model_index].set_weights([weights, bias[:,0]])
+    
+    # Saves the weights to disk
+    model.save_weights("vgg-face-my-model.h5")
+
+    # Removes the downloaded files
+    os.remove("vgg_face_matconvnet.tar.gz")
+    shutil.rmtree("weights")
+    
 
 def get_VGG_face_descriptor(img, model):
     """
@@ -58,7 +120,7 @@ def get_VGG_face_descriptor(img, model):
 
     Keyword Arguments:
     - img (np.array) : An np array that represents the face image. Shape of
-      (x, x, 64)
+      (x, x, 3)
     - model: 
 
     Returns:
