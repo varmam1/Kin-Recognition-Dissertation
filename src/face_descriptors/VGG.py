@@ -2,7 +2,7 @@ import numpy as np
 import cv2
 import tensorflow as tf
 from keras.layers import Flatten, Dense, Input, Activation, Conv2D, MaxPooling2D, Dropout
-from keras.models import Sequential, load_model
+from keras.models import Sequential, Model, load_model
 from scipy.io import loadmat
 import urllib.request
 import tarfile
@@ -14,7 +14,7 @@ import shutil
 # Using the VGG-Very-Deep-16 CNN architecture
 
 MATCONVNET_WEIGHTS_PATH="https://www.robots.ox.ac.uk/~vgg/software/vgg_face/src/vgg_face_matconvnet.tar.gz"
-
+VGG_WEIGHTS_PATH='vgg-face-my-model.h5'
 
 def create_model(weights_path=None):
     """
@@ -58,6 +58,9 @@ def create_model(weights_path=None):
     model.add(Dense(4096, activation='relu', name='fc7'))
     model.add(Dropout(0.5))
     model.add(Dense(2622, activation='softmax', name='fc8'))
+
+    if weights_path != None:
+        model.load_weights(weights_path)
 
     return model
     
@@ -106,12 +109,29 @@ def save_weights_from_vgg_face_online():
                 model.layers[base_model_index].set_weights([weights, bias[:,0]])
     
     # Saves the weights to disk
-    model.save_weights("vgg-face-my-model.h5")
+    model.save_weights(VGG_WEIGHTS_PATH)
 
     # Removes the downloaded files
     os.remove("vgg_face_matconvnet.tar.gz")
     shutil.rmtree("weights")
     
+
+def create_face_descriptor_model_with_weights():
+    """
+    A wrapper function to create the necessary model with all of the necessary
+    weights. It downloads the weights from online and saves it in the proper
+    format if the weights aren't in the proper place and, otherwise, creates
+    the model loaded with the necessary weights.
+
+    Returns:
+    - A keras Sequential model which is the VGG network loaded with the
+    weights to recognize faces.
+    """
+    if not os.path.exists(VGG_WEIGHTS_PATH):
+        save_weights_from_vgg_face_online()
+    model = create_model(VGG_WEIGHTS_PATH)
+    return Model(inputs=model.input, outputs=model.layers[-2].output)
+
 
 def get_VGG_face_descriptor(img, model):
     """
