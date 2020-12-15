@@ -19,7 +19,7 @@ VGG_WEIGHTS_PATH = 'src/face_descriptors/vgg-face-my-model.h5'
 
 def create_model(weights_path=None):
     """
-    Returns the architecture of the VGG16 model without the softmax layer.
+    Returns the architecture of the VGG16 model.
     """
     model = Sequential()
     model.add(Input(shape=(224, 224, 3)))
@@ -142,7 +142,7 @@ def create_face_descriptor_model_with_weights():
 
     Returns:
     - A keras Sequential model which is the VGG network loaded with the
-    weights to recognize faces.
+    weights to recognize faces without the softmax layer.
     """
     if not os.path.exists(VGG_WEIGHTS_PATH):
         save_weights_from_vgg_face_online(VGG_WEIGHTS_PATH)
