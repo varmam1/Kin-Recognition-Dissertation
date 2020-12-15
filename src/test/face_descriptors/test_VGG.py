@@ -9,12 +9,14 @@ def test_create_model_with_no_weights():
     assert len(model.layers) == 24
 
 
+# The following test takes a long time so only uncomment if you want to run it
 def test_get_weights_from_online():
     VGG.save_weights_from_vgg_face_online("vgg-face-test.h5")
     exists = os.path.exists("vgg-face-test.h5")
     if exists:
         os.remove("vgg-face-test.h5")
     assert exists
+
 
 def test_create_face_descriptor_model():
     model = VGG.create_model("src/face_descriptors/vgg-face-my-model.h5")
