@@ -14,7 +14,7 @@ import shutil
 # Using the VGG-Very-Deep-16 CNN architecture
 
 MATCONVNET_WEIGHTS_PATH="https://www.robots.ox.ac.uk/~vgg/software/vgg_face/src/vgg_face_matconvnet.tar.gz"
-VGG_WEIGHTS_PATH='vgg-face-my-model.h5'
+VGG_WEIGHTS_PATH='src/face_descriptors/vgg-face-my-model.h5'
 
 def create_model(weights_path=None):
     """
@@ -65,7 +65,7 @@ def create_model(weights_path=None):
     return model
     
 
-def save_weights_from_vgg_face_online():
+def save_weights_from_vgg_face_online(path_for_vgg_weights):
     """
     Downloads the matconvnet weights from
     https://www.robots.ox.ac.uk/~vgg/software/vgg_face/ and modifies it
@@ -109,7 +109,7 @@ def save_weights_from_vgg_face_online():
                 model.layers[base_model_index].set_weights([weights, bias[:,0]])
     
     # Saves the weights to disk
-    model.save_weights(VGG_WEIGHTS_PATH)
+    model.save_weights(path_for_vgg_weights)
 
     # Removes the downloaded files
     os.remove("vgg_face_matconvnet.tar.gz")
@@ -128,7 +128,7 @@ def create_face_descriptor_model_with_weights():
     weights to recognize faces.
     """
     if not os.path.exists(VGG_WEIGHTS_PATH):
-        save_weights_from_vgg_face_online()
+        save_weights_from_vgg_face_online(VGG_WEIGHTS_PATH)
     model = create_model(VGG_WEIGHTS_PATH)
     return Model(inputs=model.input, outputs=model.layers[-2].output)
 
