@@ -1,5 +1,6 @@
 from . import *
 import numpy as np
+from sklearn.neighbors import NearestNeighbors
 
 
 def get_all_values_for_a_relationship(posPairSet, negPairSet):
@@ -24,11 +25,22 @@ def get_all_values_for_a_relationship(posPairSet, negPairSet):
     - U: The transformation matrix for the relationship
     - w: The combination weights for the relationship
     """
-    
+
     # For each view, p:
-    #   Search the K-nearest neighbors of x_i^p and y_i^p with Euclidean distance for i = 1, ..., N
-    #   Construct the matrices S_p, D_p, D_{1p}, D_{2p} using the nearest neighbors
-    #   Modify S_p in a way so it isn't near singular
-    #   Get U_p using all the matrices obtained
+    for view in range(len(posPairSet)):
+
+        # Search the K-nearest neighbors of x_i^p and y_i^p with Euclidean distance for i = 1, ..., N
+        pos_x_view, pos_y_view = posPairSet[view]
+
+        x_nbrs = NearestNeighbors(n_neighbors=K).fit(pos_x_view)
+        _, x_indices = x_nbrs.kneighbors(pos_x_view)
+        y_nbrs = NearestNeighbors(n_neighbors=K).fit(pos_y_view)
+        _, y_indices = x_nbrs.kneighbors(pos_y_view)
+
+        # Construct the matrices S_p, D_p, D_{1p}, D_{2p} using the nearest neighbors
+        
+        # Modify S_p in a way so it isn't near singular
+        # Get U_p using all the matrices obtained
+
     # Obtain w using U = [U_1, ..., U_M] for all views
 
