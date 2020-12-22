@@ -31,6 +31,7 @@ def get_all_values_for_a_relationship(posPairSet, negPairSet):
 
         # Search the K-nearest neighbors of x_i^p and y_i^p with Euclidean distance for i = 1, ..., N
         pos_x_view, pos_y_view = posPairSet[view]
+        neg_x_view, neg_y_view = negPairSet[view]
 
         x_nbrs = NearestNeighbors(n_neighbors=K).fit(pos_x_view)
         _, x_indices = x_nbrs.kneighbors(pos_x_view)
@@ -38,7 +39,13 @@ def get_all_values_for_a_relationship(posPairSet, negPairSet):
         _, y_indices = x_nbrs.kneighbors(pos_y_view)
 
         # Construct the matrices S_p, D_p, D_{1p}, D_{2p} using the nearest neighbors
+        diff_S_p = pos_x_view - pos_y_view
+        S_p = np.dot(np.transpose(diff_S_p), diff_S_p)
+        S_p = 1.0/(pos_x_view.shape[0])*S_p
         
+        diff_D_p = neg_x_view - neg_y_view
+        D_p = np.dot(np.transpose(diff_D_p), diff_D_p)
+        D_p = 1.0/(neg_x_view.shape[0])*D_p
         # Modify S_p in a way so it isn't near singular
         # Get U_p using all the matrices obtained
 
