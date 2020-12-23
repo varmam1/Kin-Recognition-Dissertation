@@ -20,7 +20,7 @@ def get_diff_mat(x_view, y_view):
     """
     N = x_view.shape[0]
 
-    diff_mat = pos_x_view - pos_y_view
+    diff_mat = x_view - y_view
     mat = np.dot(np.transpose(diff_mat), diff_mat)
     mat = (1.0/N)*mat
 
@@ -57,14 +57,16 @@ def get_penalty_graphs(pos_x_view, pos_y_view, x_neighbor_indices, y_neighbor_in
         x_i = pos_x_view[i]
         y_i = pos_y_view[i]
 
-        for k in range(K):
-            diff1 = np.expand_dims((x_i - y_neighbors[k]), axis=0)
-            diff2 = np.expand_dims((x_neighbors[k] - y_i), axis=0)
+        for k in range(x_neighbor_indices.shape[1]):
+            x_k = pos_x_view[x_neighbors[k]]
+            y_k = pos_y_view[y_neighbors[k]]
+            diff1 = np.expand_dims((x_i - y_k), axis=0)
+            diff2 = np.expand_dims((x_k - y_i), axis=0)
             D_1p = D_1p + np.dot(np.transpose(diff1), diff1)
             D_2p = D_2p + np.dot(np.transpose(diff2), diff2)
 
-    D_1p = 1.0/(N * K) * D_1p
-    D_2p = 1.0/(N * K) * D_2p
+    D_1p = 1.0/(N * x_neighbor_indices.shape[1]) * D_1p
+    D_2p = 1.0/(N * x_neighbor_indices.shape[1]) * D_2p
 
     return (D_1p, D_2p)
 
@@ -127,7 +129,7 @@ def get_all_values_for_a_relationship(posPairSet, negPairSet):
 
         # TODO: Potentially way too expensive as it's sorting the eigenvalues fully
         U_p = np.transpose(eig_vecs[:d, eig_vals.argsort()[::-1]]) 
-        U.append(U_p)
+        transformation_matrices.append(U_p)
 
         # Obtain w_p using U_p
 
