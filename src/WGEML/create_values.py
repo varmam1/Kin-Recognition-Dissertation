@@ -4,8 +4,7 @@ from sklearn.neighbors import NearestNeighbors
 from scipy import linalg
 
 
-# TODO: Change function name
-def get_diff_mat(x_view, y_view):
+def get_graphs(x_view, y_view):
     """
     Returns 1/N * \sigma_{(x_i, y_i)} (x_i - y_i)^T(x_i - y_i)
 
@@ -27,7 +26,7 @@ def get_diff_mat(x_view, y_view):
     return mat
 
 
-def get_penalty_graphs(pos_x_view, pos_y_view, x_neighbor_indices, y_neighbor_indices):
+def get_penalty_graph_2(pos_x_view, pos_y_view, x_neighbor_indices, y_neighbor_indices):
     """
     Given the positive pairs and the neighbors of each of the vectors, returns
     the penalty graphs D_1p and D_2p as defined in the paper.
@@ -71,7 +70,27 @@ def get_penalty_graphs(pos_x_view, pos_y_view, x_neighbor_indices, y_neighbor_in
     return (D_1p, D_2p)
 
 
-def get_all_values_for_a_relationship(posPairSet, negPairSet):
+def get_top_d_eigenvectors(A, B, d):
+    """
+    Finds the solutions to the generalized eigenvalue problem (Ax = λBx) and
+    gives only d eigenvectors ordered by their corresponding eigenvalues in
+    descending order.
+
+    Keyword Arguments:
+    - A, B: Square matrices of the same shape which fit the format of Ax = λBx
+    - d: The amount of eigenvectors wanted
+
+    Returns:
+    - An np array of shape (d, D) where D is the dimension of each eigenvector
+    which has the top d eigenvectors ordered by descending eigenvalue
+    """
+    # TODO: Potentially way too expensive as it's sorting the eigenvalues fully
+    eig_vals, eig_vecs = linalg.eig(A, B)
+    eig_vecs = np.transpose(eig_vecs)
+    return eig_vecs[eig_vals.argsort()[::-1]][:d]
+
+
+def get_all_values_for_a_relationship(posPairSet, negPairSet, dim_of_U):
     """
     Given the positive pair set and negative pair set returns a tuple
     (U, w) where U is an array of the transformation matrices for each view
@@ -109,11 +128,12 @@ def get_all_values_for_a_relationship(posPairSet, negPairSet):
         _, y_indices = x_nbrs.kneighbors(pos_y_view)
 
         # Construct the matrices S_p, D_p, D_{1p}, D_{2p} using the nearest neighbors
+        N = pos_x_view.shape[0]
 
-        S_p = get_diff_mat(pos_x_view, pos_y_view)
-        D_p = get_diff_mat(neg_x_view, neg_y_view)
+        S_p = get_graphs(pos_x_view, pos_y_view)
+        D_p = get_graphs(neg_x_view, neg_y_view)
 
-        D_1p, D_2p = get_penalty_graphs(pos_x_view, pos_y_view, x_indices, y_indices)
+        D_1p, D_2p = get_penalty_graph_2(pos_x_view, pos_y_view, x_indices, y_indices)
 
         # Modify S_p in a way so it isn't near singular
         S_p = (1-beta) * S_p + beta*np.trace(S_p)/N * np.identity(S_p.shape[0])
@@ -122,13 +142,10 @@ def get_all_values_for_a_relationship(posPairSet, negPairSet):
         # Use the corresponding vectors to the top d eigenvalues to make up U_p
         # This will be U_p = [u_1, u_2, ..., u_d] where lambda_1 >= lambda_2 >= ...
 
-        # TODO: Figure out where this d comes from
-        d = 10
         combination_of_all_D = 0.5*(D_1p + D_2p) + D_p
-        eig_vals, eig_vecs = linalg.eig(combination_of_all_D, S_p)
 
-        # TODO: Potentially way too expensive as it's sorting the eigenvalues fully
-        U_p = np.transpose(eig_vecs[:d, eig_vals.argsort()[::-1]]) 
+        U_p = np.transpose(get_top_d_eigenvectors(combination_of_all_D, S_p, dim_of_U)) 
+        # TODO: For eigenvectors, does it want a normalized eigenvector???
         transformation_matrices.append(U_p)
 
         # Obtain w_p using U_p
