@@ -108,6 +108,10 @@ def get_all_values_for_a_relationship(posPairSet, negPairSet, dim_of_U):
     - negPairSet: The same as posPairSet except x[i] and y[i] don't have the
     specified kinship relationship.
 
+    - dim_of_U: An int which represents the amount of eigenvectors that will
+    be in each transformation matrix. This number should be significantly less
+    than the dimension of each feature vector.
+
     Returns:
     - U: The transformation matrix for the relationship
     - w: The combination weights for the relationship
@@ -118,7 +122,8 @@ def get_all_values_for_a_relationship(posPairSet, negPairSet, dim_of_U):
     # For each view, p:
     for view in range(len(posPairSet)):
 
-        # Search the K-nearest neighbors of x_i^p and y_i^p with Euclidean distance for i = 1, ..., N
+        # Search the K-nearest neighbors of x_i^p and y_i^p with
+        # Euclidean distance for i = 1, ..., N
         pos_x_view, pos_y_view = posPairSet[view]
         neg_x_view, neg_y_view = negPairSet[view]
 
@@ -144,16 +149,16 @@ def get_all_values_for_a_relationship(posPairSet, negPairSet, dim_of_U):
 
         combination_of_all_D = 0.5*(D_1p + D_2p) + D_p
 
-        U_p = np.transpose(get_top_d_eigenvectors(combination_of_all_D, S_p, dim_of_U)) 
+        U_p = np.transpose(get_top_d_eigenvectors(combination_of_all_D, S_p, dim_of_U))
         # TODO: For eigenvectors, does it want a normalized eigenvector???
         transformation_matrices.append(U_p)
 
         # Obtain w_p using U_p
 
         w_p = np.trace(np.dot(np.dot(np.transpose(U_p), S_p), U_p))
-        w_p = w_p/np.trace(np.dot(np.dot(np.transpose(U_p), combination_of_all_D), U_p))
+        w_p = w_p / np.trace(np.dot(np.dot(np.transpose(U_p), combination_of_all_D), U_p))
         w_p = (w_p)**(1.0/(r - 1))
         weights[view] = w_p
-    
+
     weights = weights/np.sum(weights)
     return (transformation_matrices, weights)
