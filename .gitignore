@@ -131,9 +131,5 @@ dmypy.json
 # Project
 .idea
 
-# TODO: Delete
-*.jpg
-!src/test/face_recognition/*.jpg
-
 # Weights files
 *.h5
