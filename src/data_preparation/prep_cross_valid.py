@@ -16,6 +16,7 @@ def get_positive_and_negative_pairs(data):
 
     Keyword Arguments:
     - data: The data obtained from the KinFaceW mat file in that format.
+    This should be a dict which has the key 'pairs' which has the information.
 
     Returns:
     - A tuple of (positivePairs, negativePairs)
@@ -36,7 +37,16 @@ def get_splits(data_of_pairs):
     - A list of the folds in which each fold is only the list of pairs of names
     of the images.
     """
-    return [data_of_pairs[data_of_pairs[:, 0] == i][:, 2:] for i in range(1, NUMBER_OF_FOLDS + 1)]
+    pairsFolded = []
+
+    for i in range(1, NUMBER_OF_FOLDS + 1):
+        pairs = data_of_pairs[data_of_pairs[:, 0] == i][:, 2:]
+        newPairFold = []
+        for pair in pairs:
+            newPairFold.append(np.array([pair[0][0], pair[1][0]]))
+        pairsFolded.append(np.array(newPairFold))
+    
+    return pairsFolded
 
 
 def get_splits_for_positive_and_negative_pairs(path_to_mat_file):
