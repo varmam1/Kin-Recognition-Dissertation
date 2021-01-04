@@ -4,9 +4,10 @@ import sys
 import os
 import pickle
 from ..face_descriptors import VGG, SIFT, LBP, HOG
+from . import *
 
 dataset = sys.argv[1]
-pathToDataset = "data/" + dataset
+pathToDataset = dataPath + dataset
 
 LBP_map = {}
 HOG_map = {}
