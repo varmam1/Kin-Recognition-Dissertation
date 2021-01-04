@@ -11,21 +11,24 @@ pathToDataset = "data/" + dataset
 LBP_map = {}
 HOG_map = {}
 SIFT_map = {}
-VGG_map = {}
+
+pathsToAllImages = []
+images = []
 
 for relationship in os.listdir(pathToDataset + "/images/"):
     path = pathToDataset + "/images/" + relationship + "/"
     for img in os.listdir(path):
         pathToImage = path + img
         if pathToImage[-3:] == "png" or pathToImage[-3:] == "jpg":
+            pathsToAllImages.append(pathToImage)
             image = cv2.imread(pathToImage)
+            images.append(image)
             LBP_map[pathToImage] = LBP.create_LBP_feature_vector(image)
             HOG_map[pathToImage] = HOG.get_HOG_feature_vector(image)
             SIFT_map[pathToImage] = SIFT.paper_main_function_SIFT(image)
-            # TODO: Potentially change the VGG one to do it all at once
-            # VGG_map[pathToImage] = VGG.get_VGG_face_descriptor(image[np.newaxis])[0]
-        else:
-            print(pathToImage)
+
+VGG_map = dict(zip(pathsToAllImages, VGG.get_VGG_face_descriptor(images)))
+
 
 # Save the face descriptors on disk
 
@@ -41,6 +44,6 @@ SIFT_face_descriptors_file = open(pathToDataset + "/SIFT_face_descriptors.pkl", 
 pickle.dump(SIFT_map, SIFT_face_descriptors_file)
 SIFT_face_descriptors_file.close()
 
-# VGG_face_descriptors_file = open(pathToDataset + "VGG_face_descriptors.pkl", "wb")
-# pickle.dump(VGG_map, VGG_face_descriptors_file)
-# VGG_face_descriptors_file.close()
+VGG_face_descriptors_file = open(pathToDataset + "VGG_face_descriptors.pkl", "wb")
+pickle.dump(VGG_map, VGG_face_descriptors_file)
+VGG_face_descriptors_file.close()
