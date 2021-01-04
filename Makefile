@@ -9,8 +9,11 @@ runTests:
 coverage:
 	coverage run -m py.test src/test && coverage report -m
 
-testLBP:
-	python3 -m src.face_descriptors.LBP
+faceDescriptorsKFW1:
+	python3 -m src.scripts.get_fds_and_save "KinFaceW-I"
+
+faceDescriptorsKFW2:
+	python3 -m src.scripts.get_fds_and_save "KinFaceW-II"
 
 clean:
 	find -iname "*.pyc" -delete
