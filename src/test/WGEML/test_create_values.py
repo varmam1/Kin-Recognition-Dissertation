@@ -57,8 +57,8 @@ def test_getting_U_and_w_for_a_basic_input_with_one_descriptor_and_dimension_10(
     x_neg = np.array([np.array([0, 0, i, 0]) for i in range(1, 11)])
     y_pos = np.array([np.array([0, i, 0, 0]) for i in range(1, 11)])
     y_neg = np.array([np.array([0, 0, 0, i]) for i in range(1, 11)])
-    posPairSet = ((x_pos, y_pos), )
-    negPairSet = ((x_neg, y_neg), )
+    posPairSet = [(x_pos, y_pos)]
+    negPairSet = [(x_neg, y_neg)]
     out = create_values.get_all_values_for_a_relationship(
         posPairSet, negPairSet, 2)
     expected_U_0 = np.zeros((4, 2))

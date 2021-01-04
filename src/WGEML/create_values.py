@@ -98,12 +98,12 @@ def get_all_values_for_a_relationship(posPairSet, negPairSet, dim_of_U):
     is a feature descriptor of the face.
 
     Keyword Arguments:
-    - posPairSet: A M-tuple where M is the number of feature descriptors that
-    are used. Each element of the tuple is a 2-tuple of numpy arrays of shape
-    (N, size) where N is the number of samples used to train and size is the
-    size of that specific type of descriptor. If this tuple is (x, y), then
-    for all i = 1, ..., N, we have that x[i] and y[i] form a positive pair
-    for this relationship.
+    - posPairSet: A M sized list where M is the number of feature descriptors
+    that are used. Each element of the tuple is a 2-tuple of numpy arrays of
+    shape (N, size) where N is the number of samples used to train and size is
+    the size of that specific type of descriptor. If this tuple is (x, y),
+    then for all i = 1, ..., N, we have that x[i] and y[i] form a positive
+    pair for this relationship.
 
     - negPairSet: The same as posPairSet except x[i] and y[i] don't have the
     specified kinship relationship.
