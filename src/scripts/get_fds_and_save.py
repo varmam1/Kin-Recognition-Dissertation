@@ -4,7 +4,7 @@ import sys
 import os
 import pickle
 from ..face_descriptors import VGG, SIFT, LBP, HOG
-from . import *
+from .. import dataPath
 
 dataset = sys.argv[1]
 pathToDataset = dataPath + dataset
