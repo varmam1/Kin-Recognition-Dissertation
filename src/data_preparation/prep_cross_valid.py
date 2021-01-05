@@ -67,3 +67,29 @@ def get_splits_for_positive_and_negative_pairs(path_to_mat_file):
 
     positive, negative = get_positive_and_negative_pairs(data)
     return (get_splits(positive), get_splits(negative))
+
+
+def get_all_training_splits(splits):
+    """
+    Given the splits, returns the list of the training splits. One fold is
+    used for testing and the rest of the folds are used for training. This
+    will return a list of the combined splits where the corresponding testing
+    split is the corresponding fold in the input. For example, the first set
+    of pairs in the output will be the training set and the first set of pairs
+    in the input is the test fold.
+
+    Keyword Arguments:
+    - splits: A list of numpy arrays with shape (N, 2) which represent the
+    pairs of either positive or negative relationship.
+
+    Returns:
+    - A list of numpy arrays of shape ((NUM_FOLDS - 1)*N, 2) which represent
+    the training splits.
+    """
+    tupledSplits = tuple(splits)
+    trainingSplits = []
+    for i in range(len(tupledSplits)):
+        training = tupledSplits[:i] + tupledSplits[i+1:]
+        trainingSplits.append(np.concatenate(training))
+    
+    return trainingSplits
