@@ -33,18 +33,18 @@ VGG_map = dict(zip(pathsToAllImages, VGG.get_VGG_face_descriptor(images)))
 
 # Save the face descriptors on disk
 
-LBP_face_descriptors_file = open(pathToDataset + "/LBP_face_descriptors.pkl", "wb")
+LBP_face_descriptors_file = open(pathToDataset + "/fds/LBP_face_descriptors.pkl", "wb")
 pickle.dump(LBP_map, LBP_face_descriptors_file)
 LBP_face_descriptors_file.close()
 
-HOG_face_descriptors_file = open(pathToDataset + "/HOG_face_descriptors.pkl", "wb")
+HOG_face_descriptors_file = open(pathToDataset + "/fds/HOG_face_descriptors.pkl", "wb")
 pickle.dump(HOG_map, HOG_face_descriptors_file)
 HOG_face_descriptors_file.close()
 
-SIFT_face_descriptors_file = open(pathToDataset + "/SIFT_face_descriptors.pkl", "wb")
+SIFT_face_descriptors_file = open(pathToDataset + "/fds/SIFT_face_descriptors.pkl", "wb")
 pickle.dump(SIFT_map, SIFT_face_descriptors_file)
 SIFT_face_descriptors_file.close()
 
-VGG_face_descriptors_file = open(pathToDataset + "VGG_face_descriptors.pkl", "wb")
+VGG_face_descriptors_file = open(pathToDataset + "/fds/VGG_face_descriptors.pkl", "wb")
 pickle.dump(VGG_map, VGG_face_descriptors_file)
 VGG_face_descriptors_file.close()
