@@ -15,3 +15,33 @@ def test_main_function_to_get_folds_from_path():
      [["test40", 'test41']], [["test60", 'test61']], [["test80", 'test81']]])
     expectedOut = (positiveFolds, negativeFolds)
     assert (out[0] == expectedOut[0]).all() and (out[1] == expectedOut[1]).all()
+
+
+# ===================== Testing Getting Training Splits ======================
+
+
+def test_get_training_splits():
+    fold1 = np.arange(4).reshape((2, 2))
+    fold2 = np.arange(4, 10).reshape((3, 2))
+    fold3 = np.arange(10, 12).reshape((1, 2))
+    fold4 = np.arange(12, 16).reshape((2, 2))
+
+    splits = [fold1, fold2, fold3, fold4]
+
+    out = prep_cross_valid.get_all_training_splits(splits)
+    expectedTrain1 = np.arange(4, 16).reshape((6, 2))
+    expectedTrain2 = np.array([[ 0,  1],
+                               [ 2,  3],
+                               [10, 11],
+                               [12, 13],
+                               [14, 15]])
+    expectedTrain3 = np.array([[ 0,  1],
+                               [ 2,  3],
+                               [ 4,  5],
+                               [ 6,  7],
+                               [ 8,  9],
+                               [12, 13],
+                               [14, 15]])
+    expectedTrain4 = np.arange(12).reshape((6, 2))
+
+    assert (out[0] == expectedTrain1).all() and (out[1] == expectedTrain2).all() and (out[2] == expectedTrain3).all() and (out[3] == expectedTrain4).all()
