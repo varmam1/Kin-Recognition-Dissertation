@@ -90,7 +90,7 @@ def get_top_d_eigenvectors(A, B, d):
     return eig_vecs[eig_vals.argsort()[::-1]][:d]
 
 
-def get_all_values_for_a_relationship(posPairSet, negPairSet, dim_of_U):
+def get_all_values_for_a_relationship(posPairSet, negPairSet, dim_of_U, restricted):
     """
     Given the positive pair set and negative pair set returns a tuple
     (U, w) where U is an array of the transformation matrices for each view
@@ -112,6 +112,9 @@ def get_all_values_for_a_relationship(posPairSet, negPairSet, dim_of_U):
     be in each transformation matrix. This number should be significantly less
     than the dimension of each feature vector.
 
+    - restricted: A boolean which represents whether this is being done with
+    an image restricted setting. If so, D_p will always be a zero matrix.
+
     Returns:
     - U: The transformation matrix for the relationship
     - w: The combination weights for the relationship
@@ -125,7 +128,6 @@ def get_all_values_for_a_relationship(posPairSet, negPairSet, dim_of_U):
         # Search the K-nearest neighbors of x_i^p and y_i^p with
         # Euclidean distance for i = 1, ..., N
         pos_x_view, pos_y_view = posPairSet[view]
-        neg_x_view, neg_y_view = negPairSet[view]
 
         x_nbrs = NearestNeighbors(n_neighbors=K).fit(pos_x_view)
         _, x_indices = x_nbrs.kneighbors(pos_x_view)
@@ -134,9 +136,14 @@ def get_all_values_for_a_relationship(posPairSet, negPairSet, dim_of_U):
 
         # Construct the matrices S_p, D_p, D_{1p}, D_{2p} using the nearest neighbors
         N = pos_x_view.shape[0]
+        dim = pos_x_view.shape[1]
 
         S_p = get_graphs(pos_x_view, pos_y_view)
-        D_p = get_graphs(neg_x_view, neg_y_view)
+        D_p = np.zeros((dim, dim))
+
+        if not restricted:
+            neg_x_view, neg_y_view = negPairSet[view]
+            D_p = get_graphs(neg_x_view, neg_y_view)
 
         D_1p, D_2p = get_penalty_graph_2(pos_x_view, pos_y_view, x_indices, y_indices)
 
