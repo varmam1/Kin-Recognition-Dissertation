@@ -20,7 +20,7 @@ def unpickle_face_descriptors(dataset):
     pathToFDs = dataPath + dataset + "/fds/"
     fd_maps = []
     for f in os.listdir(pathToFDs):
-        fd_maps.append(pickle.load(open(f, "rb")))
+        fd_maps.append(pickle.load(open(pathToFDs + f, "rb")))
     return fd_maps
 
 
@@ -37,6 +37,8 @@ def save_w_and_U(ws, trans_matrices, relationship, dataset):
     - dataset: The name of the dataset that this is being done with. Ex. KinFaceW-I
     """
     pathToSave = dataPath + dataset + "/WGEML_out/"
-    WGEML_results = open(pathToSave + "/" + relationship + "_out.pkl", "wb")
+    if not os.path.exists(pathToSave):
+        os.makedirs(pathToSave)
+    WGEML_results = open(pathToSave + relationship + "_out.pkl", "wb")
     pickle.dump({"w": ws, "U" : trans_matrices}, WGEML_results)
     WGEML_results.close()
