@@ -1,6 +1,6 @@
 import numpy as np
 import sys
-from scipy import loadmat
+from scipy.io import loadmat
 from .. import dataPath
 from ..data_preparation import save_and_load, prep_cross_valid, properly_formatted_inputs
 from ..WGEML import create_values

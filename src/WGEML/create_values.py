@@ -2,6 +2,7 @@ from . import *
 import numpy as np
 from sklearn.neighbors import NearestNeighbors
 from scipy import linalg
+from datetime import datetime
 
 
 def get_graphs(x_view, y_view):
@@ -50,6 +51,8 @@ def get_penalty_graph_2(pos_x_view, pos_y_view, x_neighbor_indices, y_neighbor_i
     D_1p = np.zeros((dim, dim))
     D_2p = np.zeros((dim, dim))
 
+    # Takes about 3s per sample and with N = 107, will take around 5.5 mins
+    # TODO: Speed this shit up. Fuck for loops
     for i in range(pos_x_view.shape[0]):
         x_neighbors = x_neighbor_indices[i]
         y_neighbors = y_neighbor_indices[i]

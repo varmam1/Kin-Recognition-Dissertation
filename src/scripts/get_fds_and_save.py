@@ -21,15 +21,14 @@ for relationship in os.listdir(pathToDataset + "/images/"):
     for img in os.listdir(path):
         pathToImage = path + img
         if pathToImage[-3:] == "png" or pathToImage[-3:] == "jpg":
-            pathsToAllImages.append(pathToImage)
+            pathsToAllImages.append(img)
             image = cv2.imread(pathToImage)
             images.append(image)
-            LBP_map[pathToImage] = LBP.create_LBP_feature_vector(image)
-            HOG_map[pathToImage] = HOG.get_HOG_feature_vector(image)
-            SIFT_map[pathToImage] = SIFT.paper_main_function_SIFT(image)
+            LBP_map[img] = LBP.create_LBP_feature_vector(image)
+            HOG_map[img] = HOG.get_HOG_feature_vector(image)
+            SIFT_map[img] = SIFT.paper_main_function_SIFT(image)
 
 VGG_map = dict(zip(pathsToAllImages, VGG.get_VGG_face_descriptor(images)))
-
 
 # Save the face descriptors on disk
 
