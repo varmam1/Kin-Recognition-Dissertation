@@ -38,12 +38,12 @@ for i in range(len(posTrainingSplits)):
     posPairSet, negPairSet = properly_formatted_inputs.get_input_to_WGEML(posPairs, negPairs, listOfFDs)
 
     if restricted.lower() == "unrestricted":
-        w, U = create_values.get_all_values_for_a_relationship(posPairSet, negPairSet, 10, False)
+        U, w = create_values.get_all_values_for_a_relationship(posPairSet, negPairSet, 10, False)
         ws.append(w)
         transformation_matrices.append(U)
     
     else:
-        w, U = create_values.get_all_values_for_a_relationship(posPairSet, [], 10, True)
+        U, w = create_values.get_all_values_for_a_relationship(posPairSet, [], 10, True)
         ws.append(w)
         transformation_matrices.append(U)
 

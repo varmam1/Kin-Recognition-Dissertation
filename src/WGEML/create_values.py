@@ -2,7 +2,6 @@ from . import *
 import numpy as np
 from sklearn.neighbors import NearestNeighbors
 from scipy import linalg
-from datetime import datetime
 
 
 def get_graphs(x_view, y_view):
@@ -84,8 +83,8 @@ def get_top_d_eigenvectors(A, B, d):
     - An np array of shape (d, D) where D is the dimension of each eigenvector
     which has the top d eigenvectors ordered by descending eigenvalue
     """
-    # TODO: Potentially way too expensive as it's sorting the eigenvalues fully
-    eig_vals, eig_vecs = linalg.eig(A, B)
+    eig_vals, eig_vecs = linalg.eig(np.dot(np.linalg.inv(B), A))
+    # eig_vals, eig_vecs = linalg.eig(A, B)
     eig_vecs = np.transpose(eig_vecs)
     return eig_vecs[eig_vals.argsort()[::-1]][:d]
 
@@ -124,7 +123,6 @@ def get_all_values_for_a_relationship(posPairSet, negPairSet, dim_of_U, restrict
 
     # For each view, p:
     for view in range(len(posPairSet)):
-
         # Search the K-nearest neighbors of x_i^p and y_i^p with
         # Euclidean distance for i = 1, ..., N
         pos_x_view, pos_y_view = posPairSet[view]

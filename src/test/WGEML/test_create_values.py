@@ -64,7 +64,7 @@ def test_getting_U_and_w_for_a_basic_input_with_one_descriptor_and_dimension_10(
     expected_U_0 = np.zeros((4, 2))
     expected_U_0[2][0] = 0.70710678
     expected_U_0[3][0] = -0.70710678
-    expected_U_0[0][1] = -0.8928498
-    expected_U_0[1][1] = -0.45035456
+    expected_U_0[0][1] = 0.8928498
+    expected_U_0[1][1] = 0.45035456
     assert np.isclose(expected_U_0, out[0][0]).all() and (
         out[1] == np.array([1.0])).all()
