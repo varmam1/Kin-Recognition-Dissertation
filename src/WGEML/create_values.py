@@ -45,27 +45,26 @@ def get_penalty_graph_2(pos_x_view, pos_y_view, x_neighbor_indices, y_neighbor_i
     Returns:
     - The matrices D_1p and D_2p as described in the paper.
     """
-    dim = pos_x_view.shape[1]
     N = pos_x_view.shape[0]
-    D_1p = np.zeros((dim, dim))
-    D_2p = np.zeros((dim, dim))
 
-    for i in range(pos_x_view.shape[0]):
-        x_neighbors = x_neighbor_indices[i]
-        y_neighbors = y_neighbor_indices[i]
-        x_i = pos_x_view[i]
-        y_i = pos_y_view[i]
+    num_neighbors = x_neighbor_indices.shape[1]
 
-        for k in range(x_neighbor_indices.shape[1]):
-            x_k = pos_x_view[x_neighbors[k]]
-            y_k = pos_y_view[y_neighbors[k]]
-            diff1 = np.expand_dims((x_i - y_k), axis=0)
-            diff2 = np.expand_dims((x_k - y_i), axis=0)
-            D_1p = D_1p + np.dot(np.transpose(diff1), diff1)
-            D_2p = D_2p + np.dot(np.transpose(diff2), diff2)
+    x_extended = np.repeat(pos_x_view, num_neighbors, axis=0)
+    y_indices = y_neighbor_indices.flatten()
+    y_neighbors = pos_y_view[y_indices]
 
-    D_1p = 1.0/(N * x_neighbor_indices.shape[1]) * D_1p
-    D_2p = 1.0/(N * x_neighbor_indices.shape[1]) * D_2p
+    diff_mat_1 = x_extended - y_neighbors
+    D_1p = np.dot(np.transpose(diff_mat_1), diff_mat_1)
+
+    y_extended = np.repeat(pos_y_view, num_neighbors, axis=0)
+    x_indices = x_neighbor_indices.flatten()
+    x_neighbors = pos_x_view[x_indices]
+
+    diff_mat_2 = x_neighbors - y_extended
+    D_2p = np.dot(np.transpose(diff_mat_2), diff_mat_2)
+
+    D_1p = 1.0/(N * num_neighbors) * D_1p
+    D_2p = 1.0/(N * num_neighbors) * D_2p
 
     return (D_1p, D_2p)
 
@@ -84,13 +83,13 @@ def get_top_d_eigenvectors(A, B, d):
     - An np array of shape (d, D) where D is the dimension of each eigenvector
     which has the top d eigenvectors ordered by descending eigenvalue
     """
-    # TODO: Potentially way too expensive as it's sorting the eigenvalues fully
-    eig_vals, eig_vecs = linalg.eig(A, B)
+    eig_vals, eig_vecs = linalg.eig(np.dot(np.linalg.inv(B), A))
+    # eig_vals, eig_vecs = linalg.eig(A, B)
     eig_vecs = np.transpose(eig_vecs)
     return eig_vecs[eig_vals.argsort()[::-1]][:d]
 
 
-def get_all_values_for_a_relationship(posPairSet, negPairSet, dim_of_U):
+def get_all_values_for_a_relationship(posPairSet, negPairSet, dim_of_U, restricted):
     """
     Given the positive pair set and negative pair set returns a tuple
     (U, w) where U is an array of the transformation matrices for each view
@@ -112,6 +111,9 @@ def get_all_values_for_a_relationship(posPairSet, negPairSet, dim_of_U):
     be in each transformation matrix. This number should be significantly less
     than the dimension of each feature vector.
 
+    - restricted: A boolean which represents whether this is being done with
+    an image restricted setting. If so, D_p will always be a zero matrix.
+
     Returns:
     - U: The transformation matrix for the relationship
     - w: The combination weights for the relationship
@@ -121,11 +123,9 @@ def get_all_values_for_a_relationship(posPairSet, negPairSet, dim_of_U):
 
     # For each view, p:
     for view in range(len(posPairSet)):
-
         # Search the K-nearest neighbors of x_i^p and y_i^p with
         # Euclidean distance for i = 1, ..., N
         pos_x_view, pos_y_view = posPairSet[view]
-        neg_x_view, neg_y_view = negPairSet[view]
 
         x_nbrs = NearestNeighbors(n_neighbors=K).fit(pos_x_view)
         _, x_indices = x_nbrs.kneighbors(pos_x_view)
@@ -134,9 +134,14 @@ def get_all_values_for_a_relationship(posPairSet, negPairSet, dim_of_U):
 
         # Construct the matrices S_p, D_p, D_{1p}, D_{2p} using the nearest neighbors
         N = pos_x_view.shape[0]
+        dim = pos_x_view.shape[1]
 
         S_p = get_graphs(pos_x_view, pos_y_view)
-        D_p = get_graphs(neg_x_view, neg_y_view)
+        D_p = np.zeros((dim, dim))
+
+        if not restricted:
+            neg_x_view, neg_y_view = negPairSet[view]
+            D_p = get_graphs(neg_x_view, neg_y_view)
 
         D_1p, D_2p = get_penalty_graph_2(pos_x_view, pos_y_view, x_indices, y_indices)
 
