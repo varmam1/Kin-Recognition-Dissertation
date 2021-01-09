@@ -15,6 +15,14 @@ faceDescriptorsKFW1:
 faceDescriptorsKFW2:
 	python3 -m src.scripts.get_fds_and_save "KinFaceW-II"
 
+faceDescriptorsTSK:
+	python3 -m src.scripts.get_fds_and_save "TSKinFace"
+
+getAllFaceDescriptors:
+	make faceDescriptorsKFW1
+	make faceDescriptorsKFW2
+	make faceDescriptorsTSK
+
 runWGEMLKFW1Unrestricted:
 	python3 -m src.scripts.run_WGEML "KinFaceW-I" "fd" "unrestricted"
 	python3 -m src.scripts.run_WGEML "KinFaceW-I" "fs" "unrestricted"
@@ -38,6 +46,21 @@ runWGEMLKFW2Restricted:
 	python3 -m src.scripts.run_WGEML "KinFaceW-II" "fs" "restricted"
 	python3 -m src.scripts.run_WGEML "KinFaceW-II" "md" "restricted"
 	python3 -m src.scripts.run_WGEML "KinFaceW-II" "ms" "restricted"
+
+runWGEMLTSK:
+	python3 -m src.scripts.run_WGEML "TSKinFace" "fd" "null"
+	python3 -m src.scripts.run_WGEML "TSKinFace" "fs" "null"
+	python3 -m src.scripts.run_WGEML "TSKinFace" "md" "null"
+	python3 -m src.scripts.run_WGEML "TSKinFace" "ms" "null"
+	python3 -m src.scripts.run_WGEML "TSKinFace" "fmd" "null"
+	python3 -m src.scripts.run_WGEML "TSKinFace" "fms" "null"
+
+runWGEML:
+	make runWGEMLKFW1Unrestricted
+	make runWGEMLKFW1Restricted
+	make runWGEMLKFW2Unrestricted
+	make runWGEMLKFW2Restricted
+	make runWGEMLTSK
 
 clean:
 	find -iname "*.pyc" -delete
