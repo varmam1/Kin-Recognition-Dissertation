@@ -1,6 +1,6 @@
 import numpy as np
 import sys
-from scipy.io import loadmat
+from scipy.io import loadmat, savemat
 from .. import dataPath
 from ..data_preparation import save_and_load, prep_cross_valid, properly_formatted_inputs
 from ..WGEML import create_values
@@ -16,34 +16,49 @@ restricted = sys.argv[3]
 
 # mat_to_cross_folds
 pathToMat = dataPath + dataset + "/meta_data/" + relationship + "_pairs.mat"
-positiveSplits, negativeSplits = prep_cross_valid.get_splits_for_positive_and_negative_pairs(pathToMat)
-
-# Run the get_cv_config
-posTrainingSplits = prep_cross_valid.get_all_training_splits(positiveSplits)
-negTrainingSplits = prep_cross_valid.get_all_training_splits(negativeSplits)
 
 # Unpickle the face descriptors
 listOfFDs = save_and_load.unpickle_face_descriptors(dataset)
 
-# For each training set, run the maps_w_pairs_to_input and then run 
-# WGEML on that and add to a list both w and U
-ws = []
-transformation_matrices = []
-for i in range(len(posTrainingSplits)):
-    posPairs = posTrainingSplits[i]
-    negPairs = negTrainingSplits[i]
+if dataset != "TSKinFace":
+    positiveSplits, negativeSplits = prep_cross_valid.get_splits_for_positive_and_negative_pairs(pathToMat)
 
-    posPairSet, negPairSet = properly_formatted_inputs.get_input_to_WGEML(posPairs, negPairs, listOfFDs)
+    # Run the get_cv_config
+    posTrainingSplits = prep_cross_valid.get_all_training_splits(positiveSplits)
+    negTrainingSplits = prep_cross_valid.get_all_training_splits(negativeSplits)
 
-    if restricted.lower() == "unrestricted":
-        U, w = create_values.get_all_values_for_a_relationship(posPairSet, negPairSet, 10, False)
+    # For each training set, run the maps_w_pairs_to_input and then run 
+    # WGEML on that and add to a list both w and U
+    ws = []
+    transformation_matrices = []
+    for i in range(len(posTrainingSplits)):
+        posPairs = posTrainingSplits[i]
+        negPairs = negTrainingSplits[i]
+
+        posPairSet, negPairSet = properly_formatted_inputs.get_input_to_WGEML(posPairs, negPairs, listOfFDs)
+
+        if restricted.lower() == "unrestricted":
+            U, w = create_values.get_all_values_for_a_relationship(posPairSet, negPairSet=negPairSet)
+            ws.append(w)
+            transformation_matrices.append(U)
+        
+        else:
+            U, w = create_values.get_all_values_for_a_relationship(posPairSet)
+            ws.append(w)
+            transformation_matrices.append(U)
+
+    # Once done with each training set, call save_w_and_U
+    save_and_load.save_w_and_U(ws, transformation_matrices, relationship, dataset)
+
+else:
+    training, testing = prep_cross_valid.TSK_get_splits(pathToMat, True)
+    ws = []
+    transformation_matrices = []
+    for i in range(len(training)):
+        posPairSet, _ = properly_formatted_inputs.get_input_to_WGEML(training[i], None, listOfFDs)
+        U, w = create_values.get_all_values_for_a_relationship(posPairSet)
         ws.append(w)
         transformation_matrices.append(U)
+    save_and_load.save_w_and_U(ws, transformation_matrices, relationship, dataset)
+    savemat(dataPath + "TSKinFace/splits/" + relationship + "_splits.mat", {"splits" : [training, testing]})
     
-    else:
-        U, w = create_values.get_all_values_for_a_relationship(posPairSet, [], 10, True)
-        ws.append(w)
-        transformation_matrices.append(U)
-
-# Once done with each training set, call save_w_and_U
-save_and_load.save_w_and_U(ws, transformation_matrices, relationship, dataset)

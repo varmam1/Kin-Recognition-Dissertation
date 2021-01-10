@@ -116,7 +116,7 @@ def TSK_get_splits(path_to_mat_file, shuffle_data):
     """
     data = loadmat(path_to_mat_file,
         matlab_compatible=False, struct_as_record=False)
-    pairs = data["pairs"]
+    pairs = np.char.strip(data["pairs"])
 
     splitter = KFold(n_splits=NUMBER_OF_FOLDS, shuffle=shuffle_data)
 
