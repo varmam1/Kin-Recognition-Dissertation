@@ -52,7 +52,7 @@ def test_get_training_splits():
 
 def test_getting_training_splits_for_TSK_dataset():
     out = prep_cross_valid.TSK_get_splits("src/test/data_preparation/testTSK.mat", False)
-    origInput = np.arange(10, 30).reshape(10, 2)
+    origInput = np.arange(10, 30).reshape(10, 2).astype(str)
     expectedOutTrain = [origInput[2:], origInput[np.r_[0:2, 4:10]], origInput[np.r_[0:4, 6:10]], origInput[np.r_[0:6, 8:10]], origInput[:8]]
     expectedOutTest = [origInput[:2], origInput[2:4], origInput[4:6], origInput[6:8], origInput[8:]]
 

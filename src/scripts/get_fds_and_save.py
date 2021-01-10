@@ -9,12 +9,13 @@ from .. import dataPath
 dataset = sys.argv[1]
 pathToDataset = dataPath + dataset
 
-LBP_map = {}
-HOG_map = {}
-SIFT_map = {}
+LBP_fds = []
+HOG_fds = []
+SIFT_fds = []
 
 pathsToAllImages = []
 images = []
+face_descriptors = []
 
 for relationship in os.listdir(pathToDataset + "/images/"):
     path = pathToDataset + "/images/" + relationship + "/"
@@ -24,9 +25,12 @@ for relationship in os.listdir(pathToDataset + "/images/"):
             pathsToAllImages.append(img)
             image = cv2.imread(pathToImage)
             images.append(image)
-            LBP_map[img] = LBP.create_LBP_feature_vector(image)
-            HOG_map[img] = HOG.get_HOG_feature_vector(image)
-            SIFT_map[img] = SIFT.paper_main_function_SIFT(image)
+            LBP.create_LBP_feature_vector(image)
+            HOG.get_HOG_feature_vector(image)
+            SIFT.paper_main_function_SIFT(image)
+            # LBP_map[img] = LBP.create_LBP_feature_vector(image)
+            # HOG_map[img] = HOG.get_HOG_feature_vector(image)
+            # SIFT_map[img] = SIFT.paper_main_function_SIFT(image)
 
 VGG_map = dict(zip(pathsToAllImages, VGG.get_VGG_face_descriptor(images)))
 
