@@ -89,7 +89,7 @@ def get_top_d_eigenvectors(A, B, d):
     return eig_vecs[eig_vals.argsort()[::-1]][:d]
 
 
-def get_all_values_for_a_relationship(posPairSet, negPairSet, dim_of_U, restricted):
+def get_all_values_for_a_relationship(posPairSet, negPairSet=None, dim_of_U=10):
     """
     Given the positive pair set and negative pair set returns a tuple
     (U, w) where U is an array of the transformation matrices for each view
@@ -110,9 +110,6 @@ def get_all_values_for_a_relationship(posPairSet, negPairSet, dim_of_U, restrict
     - dim_of_U: An int which represents the amount of eigenvectors that will
     be in each transformation matrix. This number should be significantly less
     than the dimension of each feature vector.
-
-    - restricted: A boolean which represents whether this is being done with
-    an image restricted setting. If so, D_p will always be a zero matrix.
 
     Returns:
     - U: The transformation matrix for the relationship
@@ -139,7 +136,7 @@ def get_all_values_for_a_relationship(posPairSet, negPairSet, dim_of_U, restrict
         S_p = get_graphs(pos_x_view, pos_y_view)
         D_p = np.zeros((dim, dim))
 
-        if not restricted:
+        if negPairSet != None:
             neg_x_view, neg_y_view = negPairSet[view]
             D_p = get_graphs(neg_x_view, neg_y_view)
 

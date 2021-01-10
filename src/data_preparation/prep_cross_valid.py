@@ -1,5 +1,6 @@
 import numpy as np
 from scipy.io import loadmat
+from sklearn.model_selection import KFold
 
 
 # This file is to prepare the splits and positive and negative data pairs
@@ -93,3 +94,36 @@ def get_all_training_splits(splits):
         trainingSplits.append(np.concatenate(training))
     
     return trainingSplits
+
+
+# ===================== TSKinFace Dataset Prep Functions =====================
+
+
+def TSK_get_splits(path_to_mat_file, shuffle_data):
+    """
+
+    Keyword Arguments:
+    - path_to_mat_file (str): A string which is just the path to the
+        mat file that has the pairs for TSKinFace
+
+    - shuffle_data (bool) : Whether or not to shuffle the pairs around before
+        assigning them to splits.
+
+    Returns:
+    - A list of numpy arrays of shape ((NUM_FOLDS - 1)*N, 2) which represent
+    the training splits and a list of numpy arrays which represents the test
+    splits.
+    """
+    data = loadmat(path_to_mat_file,
+        matlab_compatible=False, struct_as_record=False)
+    pairs = np.char.strip(data["pairs"])
+
+    splitter = KFold(n_splits=NUMBER_OF_FOLDS, shuffle=shuffle_data)
+
+    training = []
+    testing = []
+    for train, test in splitter.split(pairs):
+        training.append(pairs[train])
+        testing.append(pairs[test])
+    return (training, testing)
+    

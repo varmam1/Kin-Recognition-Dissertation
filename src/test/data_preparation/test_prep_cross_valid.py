@@ -45,3 +45,22 @@ def test_get_training_splits():
     expectedTrain4 = np.arange(12).reshape((6, 2))
 
     assert (out[0] == expectedTrain1).all() and (out[1] == expectedTrain2).all() and (out[2] == expectedTrain3).all() and (out[3] == expectedTrain4).all()
+
+
+# =============== Testing Getting Training Sets For TSKinFace ================
+
+
+def test_getting_training_splits_for_TSK_dataset():
+    out = prep_cross_valid.TSK_get_splits("src/test/data_preparation/testTSK.mat", False)
+    origInput = np.arange(10, 30).reshape(10, 2)
+    expectedOutTrain = [origInput[2:], origInput[np.r_[0:2, 4:10]], origInput[np.r_[0:4, 6:10]], origInput[np.r_[0:6, 8:10]], origInput[:8]]
+    expectedOutTest = [origInput[:2], origInput[2:4], origInput[4:6], origInput[6:8], origInput[8:]]
+
+    trainSame = True
+    testSame = True
+    for i in range(len(out[0])):
+        trainSame = trainSame and (out[0][i] == expectedOutTrain[i]).all()
+        testSame = testSame and (out[1][i] == expectedOutTest[i]).all()
+    
+    assert trainSame and testSame
+
