@@ -29,7 +29,7 @@ def get_input_to_WGEML(posPairs, negPairs, face_descriptors):
         posViewTuple = (posX, posY)
         posPairSet.append(posViewTuple)
         
-        if negPairs != None:
+        if negPairs is not None:
             negDescriptors = np.array([[face_descriptor_map[k] for k in l] for l in negPairs])
             negX = negDescriptors[:, 0]
             negY = negDescriptors[:, 1]
