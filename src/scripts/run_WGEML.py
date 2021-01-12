@@ -48,10 +48,10 @@ if dataset != "TSKinFace":
             transformation_matrices.append(U)
 
     # Once done with each training set, call save_w_and_U
-    save_and_load.save_w_and_U(ws, transformation_matrices, relationship, dataset)
+    save_and_load.save_w_and_U(ws, transformation_matrices, relationship, dataset, restricted=restricted)
 
 else:
-    training, testing = prep_cross_valid.TSK_get_splits(pathToMat, True)
+    training, testing = prep_cross_valid.TSK_get_splits(pathToMat, True, relationship)
     ws = []
     transformation_matrices = []
     for i in range(len(training)):

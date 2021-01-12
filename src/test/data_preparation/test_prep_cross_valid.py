@@ -51,7 +51,7 @@ def test_get_training_splits():
 
 
 def test_getting_training_splits_for_TSK_dataset():
-    out = prep_cross_valid.TSK_get_splits("src/test/data_preparation/testTSK.mat", False)
+    out = prep_cross_valid.TSK_get_splits("src/test/data_preparation/testTSK.mat", False, "fd")
     origInput = np.arange(10, 30).reshape(10, 2).astype(str)
     expectedOutTrain = [origInput[2:], origInput[np.r_[0:2, 4:10]], origInput[np.r_[0:4, 6:10]], origInput[np.r_[0:6, 8:10]], origInput[:8]]
     expectedOutTest = [origInput[:2], origInput[2:4], origInput[4:6], origInput[6:8], origInput[8:]]
@@ -64,3 +64,67 @@ def test_getting_training_splits_for_TSK_dataset():
     
     assert trainSame and testSame
 
+
+def test_getting_training_splits_for_TSK_dataset_with_tri_relationship():
+    out = prep_cross_valid.TSK_get_splits("src/test/data_preparation/fdm_test.mat", False, "fdm")
+    origInput = np.arange(10, 25).reshape(5, 3).astype(str)
+
+    expectedOutTrain = []
+    expectedOutTrain.append(np.array([['13', '15'],
+                                        ['16', '18'],
+                                        ['19', '21'],
+                                        ['22', '24'],
+                                        ['14', '15'],
+                                        ['17', '18'],
+                                        ['20', '21'],
+                                        ['23', '24']]))
+
+    expectedOutTrain.append(np.array([['10', '12'],
+                                        ['16', '18'],
+                                        ['19', '21'],
+                                        ['22', '24'],
+                                        ['11', '12'],
+                                        ['17', '18'],
+                                        ['20', '21'],
+                                        ['23', '24']]))
+
+    expectedOutTrain.append(np.array([['10', '12'],
+                                        ['13', '15'],
+                                        ['19', '21'],
+                                        ['22', '24'],
+                                        ['11', '12'],
+                                        ['13', '15'],
+                                        ['20', '21'],
+                                        ['23', '24']]))
+
+    expectedOutTrain.append(np.array([['10', '12'],
+                                        ['13', '15'],
+                                        ['16', '18'],
+                                        ['22', '24'],
+                                        ['11', '12'],
+                                        ['13', '15'],
+                                        ['17', '18'],
+                                        ['23', '24']]))
+
+    expectedOutTrain.append(np.array([['10', '12'],
+                                        ['13', '15'],
+                                        ['16', '18'],
+                                        ['19', '21'],
+                                        ['11', '12'],
+                                        ['13', '15'],
+                                        ['17', '18'],
+                                        ['20', '21']]))
+
+    expectedOutTest = [np.array([['10', '12'], ['11', '12']]),
+                       np.array([['13', '15'], ['14', '15']]),
+                       np.array([['16', '18'], ['17', '18']]),
+                       np.array([['19', '21'], ['20', '21']]),
+                       np.array([['22', '24'], ['23', '24']])]
+
+    trainSame = True
+    testSame = True
+    for i in range(len(out[0])):
+        trainSame = trainSame and (out[0][i] == expectedOutTrain[i]).all()
+        testSame = testSame and (out[1][i] == expectedOutTest[i]).all()
+    
+    assert testSame

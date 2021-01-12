@@ -24,7 +24,7 @@ def unpickle_face_descriptors(dataset):
     return fd_maps
 
 
-def save_w_and_U(ws, trans_matrices, relationship, dataset):
+def save_w_and_U(ws, trans_matrices, relationship, dataset, restricted=None):
     """
     For a relationship, ex. father-daughter, and the dataset, save all of the
     w and U vectors and matrices for each training set in a map and saves on
@@ -35,8 +35,11 @@ def save_w_and_U(ws, trans_matrices, relationship, dataset):
     - trans_matrices: A list of the U matrix for each training set
     - relationship: What relationship is being tested (ex. father-daughter, etc.)
     - dataset: The name of the dataset that this is being done with. Ex. KinFaceW-I
+    - restricted: A string setting for WGEML about whether it's restricted or not.
     """
     pathToSave = dataPath + dataset + "/WGEML_out/"
+    if restricted is not None:
+        pathToSave = pathToSave + restricted + "/"
     if not os.path.exists(pathToSave):
         os.makedirs(pathToSave)
     WGEML_results = open(pathToSave + relationship + "_out.pkl", "wb")

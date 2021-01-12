@@ -99,7 +99,7 @@ def get_all_training_splits(splits):
 # ===================== TSKinFace Dataset Prep Functions =====================
 
 
-def TSK_get_splits(path_to_mat_file, shuffle_data):
+def TSK_get_splits(path_to_mat_file, shuffle_data, relationship):
     """
 
     Keyword Arguments:
@@ -109,11 +109,18 @@ def TSK_get_splits(path_to_mat_file, shuffle_data):
     - shuffle_data (bool) : Whether or not to shuffle the pairs around before
         assigning them to splits.
 
+    - relationship (str) : A string which is either 2 or 3 characters which
+        describes the relationship this is for. If it is for a tri-kin
+        relationship, the triplets will be split into pairs.
+
     Returns:
     - A list of numpy arrays of shape ((NUM_FOLDS - 1)*N, 2) which represent
     the training splits and a list of numpy arrays which represents the test
     splits.
     """
+    # If FMD for example, then the positive pairs will be FD and MD combined
+    # They say "In each fold, we exploit all pairs of face images with kin relation to form positive pairs."
+
     data = loadmat(path_to_mat_file,
         matlab_compatible=False, struct_as_record=False)
     pairs = np.char.strip(data["pairs"])
@@ -123,7 +130,14 @@ def TSK_get_splits(path_to_mat_file, shuffle_data):
     training = []
     testing = []
     for train, test in splitter.split(pairs):
-        training.append(pairs[train])
-        testing.append(pairs[test])
+        trainSet = pairs[train]
+        testSet = pairs[test]
+
+        if len(relationship) == 3:
+            trainSet = np.concatenate((trainSet[:,[0,2]], trainSet[:,[1,2]]))
+            testSet = np.concatenate((testSet[:,[0,2]], testSet[:,[1,2]]))
+
+        training.append(trainSet)
+        testing.append(testSet)
     return (training, testing)
     
