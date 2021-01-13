@@ -26,15 +26,15 @@ def test_save_w_and_U():
     save_and_load.save_w_and_U(w, U, "testRel", "test")
 
     # Load the files, check if it's what is wanted then delete the saved files
-    out = pickle.load(open(dataPath + "test/WGEML_out/testRel_out.pkl", "rb"))
+    out = save_and_load.load_w_and_U("test", "testRel")
     shutil.rmtree(dataPath + "test")
 
-    correct = (out["w"][0] == w1).all() and (out["w"][1] == w2).all()
-    correct = correct and (out["U"][0] == U1).all() and (out["U"][1] == U2).all()
+    correct = (out[0][0] == w1).all() and (out[0][1] == w2).all()
+    correct = correct and (out[1][0] == U1).all() and (out[1][1] == U2).all()
     assert correct
 
 
-def test_save_w_and_U_with_restricted():
+def test_save_and_load_w_and_U_with_restricted():
     w1 = np.array([1, 2, 3])
     w2 = np.array([2, 3, 4])
     w = [w1, w2]
@@ -46,9 +46,9 @@ def test_save_w_and_U_with_restricted():
     save_and_load.save_w_and_U(w, U, "testRel", "test", "restricted")
 
     # Load the files, check if it's what is wanted then delete the saved files
-    out = pickle.load(open(dataPath + "test/WGEML_out/restricted/testRel_out.pkl", "rb"))
+    out = save_and_load.load_w_and_U("test", "testRel", "restricted")
     shutil.rmtree(dataPath + "test")
 
-    correct = (out["w"][0] == w1).all() and (out["w"][1] == w2).all()
-    correct = correct and (out["U"][0] == U1).all() and (out["U"][1] == U2).all()
+    correct = (out[0][0] == w1).all() and (out[0][1] == w2).all()
+    correct = correct and (out[1][0] == U1).all() and (out[1][1] == U2).all()
     assert correct
