@@ -127,7 +127,7 @@ def get_all_values_for_a_relationship(posPairSet, negPairSet=None, dim_of_U=10):
         x_nbrs = NearestNeighbors(n_neighbors=K).fit(pos_x_view)
         _, x_indices = x_nbrs.kneighbors(pos_x_view)
         y_nbrs = NearestNeighbors(n_neighbors=K).fit(pos_y_view)
-        _, y_indices = x_nbrs.kneighbors(pos_y_view)
+        _, y_indices = y_nbrs.kneighbors(pos_y_view)
 
         # Construct the matrices S_p, D_p, D_{1p}, D_{2p} using the nearest neighbors
         N = pos_x_view.shape[0]
