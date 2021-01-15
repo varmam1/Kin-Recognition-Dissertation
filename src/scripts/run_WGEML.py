@@ -10,6 +10,11 @@ from ..WGEML import create_values
 # The above runs WGEML for the dataset KinFaceW-I with the father-daughter relationship
 # And with the image-unrestricted setting in which case negative pairs are given to WGEML
 
+# TODO: For the dimension of U, could it be 100 and PCA only drops the feature vectors to 200 
+#       since we have in the paper "we use PCA to project each feature representation to a 
+#       200-dimensional space and then set the reduced dimension as 100" The reduced dimension might be d
+#       and not a truncation thing.
+
 dataset = sys.argv[1]
 relationship = sys.argv[2]
 restricted = sys.argv[3]
