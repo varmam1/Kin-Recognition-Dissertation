@@ -10,10 +10,7 @@ from ..WGEML import create_values
 # The above runs WGEML for the dataset KinFaceW-I with the father-daughter relationship
 # And with the image-unrestricted setting in which case negative pairs are given to WGEML
 
-# TODO: For the dimension of U, could it be 100 and PCA only drops the feature vectors to 200 
-#       since we have in the paper "we use PCA to project each feature representation to a 
-#       200-dimensional space and then set the reduced dimension as 100" The reduced dimension might be d
-#       and not a truncation thing.
+dim_of_trans_matrix = 100
 
 dataset = sys.argv[1]
 relationship = sys.argv[2]
@@ -43,12 +40,12 @@ if dataset != "TSKinFace":
         posPairSet, negPairSet = properly_formatted_inputs.get_input_to_WGEML(posPairs, negPairs, listOfFDs)
 
         if restricted.lower() == "unrestricted":
-            U, w = create_values.get_all_values_for_a_relationship(posPairSet, negPairSet=negPairSet)
+            U, w = create_values.get_all_values_for_a_relationship(posPairSet, negPairSet=negPairSet, dim_of_U=dim_of_trans_matrix)
             ws.append(w)
             transformation_matrices.append(U)
         
         else:
-            U, w = create_values.get_all_values_for_a_relationship(posPairSet)
+            U, w = create_values.get_all_values_for_a_relationship(posPairSet, dim_of_U=dim_of_trans_matrix)
             ws.append(w)
             transformation_matrices.append(U)
 
@@ -61,7 +58,7 @@ else:
     transformation_matrices = []
     for i in range(len(training)):
         posPairSet, _ = properly_formatted_inputs.get_input_to_WGEML(training[i], None, listOfFDs)
-        U, w = create_values.get_all_values_for_a_relationship(posPairSet)
+        U, w = create_values.get_all_values_for_a_relationship(posPairSet, dim_of_U=dim_of_trans_matrix)
         ws.append(w)
         transformation_matrices.append(U)
     save_and_load.save_w_and_U(ws, transformation_matrices, relationship, dataset)

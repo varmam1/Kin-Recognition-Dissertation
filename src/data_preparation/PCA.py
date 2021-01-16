@@ -2,7 +2,7 @@ import numpy as np
 from sklearn.decomposition import PCA
 
 
-def reduce_dimensions(vectors, dim=200, amount_to_truncate=100):
+def reduce_dimensions(vectors, dim=200, amount_to_truncate=200):
     """
     Given a numpy array of face descriptor vectors, reduces the dimensions
     to the inputted number and returns the array of the reduced vectors.
