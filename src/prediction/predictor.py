@@ -1,7 +1,7 @@
 import numpy as np
 
 
-def predict_if_kin_1(w, U, xs, ys, theta):
+def predict_if_kin_1(w, U, xs, ys, theta, triRel=False):
     """
     Given the weights and U matrices for each view along with all of the pairs
     that need to be predicted whether they are of the kin relationship being
@@ -20,6 +20,8 @@ def predict_if_kin_1(w, U, xs, ys, theta):
     - ys: An np array of shape (N, M, D) with the same description as xs.
     - theta: A float which represents the threshold that cosine similarity
         should be if they are of the kin relation.
+    - triRel: A boolean which represents whether this is being tested for a tri
+        kin relationship.
 
     Returns:
     - A boolean np array of shape (N, ) in which each element corresponds to
@@ -40,4 +42,9 @@ def predict_if_kin_1(w, U, xs, ys, theta):
         similarlity_vals = w_p * (cosine_vals + 1)/2
         scoreVector = scoreVector + similarlity_vals
 
+    if triRel:
+        # If tri-kin relationship, mean similarity between father and mother scores
+        fatherScore = scoreVector[:int(len(scoreVector)/2)]
+        motherScore = scoreVector[int(len(scoreVector)/2):]
+        scoreVector = (fatherScore + motherScore)/2
     return scoreVector >= theta

@@ -25,7 +25,7 @@ def test_prediction_algo_1_with_Euclidean_metric_with_1_view():
     for i in range(5):
         x = xs[i][0]
         y = ys[i][0]
-        expectedOut.append((np.dot(x, np.transpose(y))/(np.linalg.norm(x) * np.linalg.norm(y)) + 1)/2 >= 0.9)
+        expectedOut.append((np.dot(x, np.transpose(y))/(np.linalg.norm(x) * np.linalg.norm(y)) + 1)/2 >= theta)
     expectedOut = np.array(expectedOut)
     assert (out == expectedOut).all()
 
@@ -63,4 +63,24 @@ def test_prediction_algo_1_with_nonEuclidean_metric_with_2_views():
             simScore = simScore + w[j] * 0.5 * (top/bottom + 1)
         expectedOut.append(simScore >= theta)
     expectedOut = np.array(expectedOut)
+    assert (out == expectedOut).all()
+
+
+def test_prediction_algo_1_with_Euclidean_metric_with_1_view_with_tri_relationship():
+    U = [np.identity(3)]
+    w = np.array([1.0])
+
+    xs = np.array([[[1, 2, 3]],
+                   [[1, 1, 1]],
+                   [[2, 1, 1]],
+                   [[1, 2, 1]]])
+
+    ys = np.array([[[2, 2, 3]],
+                   [[1, 5, 1]],
+                   [[4, 2, 2]],
+                   [[-1, -2, -1]]])
+    theta = 0.8
+
+    out = predictor.predict_if_kin_1(w, U, xs, ys, theta, triRel=True)
+    expectedOut = np.array([True, False])
     assert (out == expectedOut).all()
