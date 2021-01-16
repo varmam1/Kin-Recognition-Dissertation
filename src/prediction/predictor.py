@@ -27,8 +27,8 @@ def predict_if_kin_1(w, U, xs, ys, theta):
     """
     scoreVector = np.zeros(xs.shape[0])
     for p in range(len(w)):
-        xs_p = xs[:, p, :]
-        ys_p = ys[:, p, :]
+        xs_p = xs[:, p]
+        ys_p = ys[:, p]
         A_p = np.dot(U[p], np.transpose(U[p]))
         w_p = w[p]
         # This should be a vector of length N
