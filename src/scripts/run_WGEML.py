@@ -65,5 +65,7 @@ else:
         ws.append(w)
         transformation_matrices.append(U)
     save_and_load.save_w_and_U(ws, transformation_matrices, relationship, dataset)
-    savemat(dataPath + "TSKinFace/splits/" + relationship + "_splits.mat", {"splits" : [training, testing]})
+    trainTestSets = open(dataPath + "TSKinFace/splits/" + relationship + "_splits.pkl", "wb")
+    pickle.dump({"trainSets": training, "testSets" : testing}, trainTestSets)
+    trainTestSets.close()
     
