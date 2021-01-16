@@ -45,3 +45,23 @@ def save_w_and_U(ws, trans_matrices, relationship, dataset, restricted=None):
     WGEML_results = open(pathToSave + relationship + "_out.pkl", "wb")
     pickle.dump({"w": ws, "U" : trans_matrices}, WGEML_results)
     WGEML_results.close()
+
+
+def load_w_and_U(dataset, relationship, restricted=None):
+    """
+    Loads the w and U values from disk given the necessary configuration.
+
+    Keyword Arguments:
+    - dataset: The name of the dataset that this is being done with. Ex. KinFaceW-I
+    - relationship: What relationship is being tested (ex. father-daughter, etc.)
+    - restricted: A string setting for WGEML about whether it's restricted or not.
+
+    Returns:
+    - A pair, (w, U).
+    """
+    pathToSave = dataPath + dataset + "/WGEML_out/"
+    if restricted is not None:
+        pathToSave = pathToSave + restricted + "/"
+    WGEML_results = open(pathToSave + relationship + "_out.pkl", "rb")
+    data = pickle.load(WGEML_results)
+    return (data['w'], data['U'])

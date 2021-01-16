@@ -3,11 +3,19 @@ SHELL := /bin/bash
 init:
 	pip3 install -r requirements.txt
 
+###############################
+######## Test Targets #########
+###############################
 runTests:
 	py.test src/test
 
 coverage:
 	coverage run -m py.test src/test && coverage report -m
+
+
+#################################
+# Face Descriptor Maker Targets #
+#################################
 
 faceDescriptorsKFW1:
 	python3 -m src.scripts.get_fds_and_save "KinFaceW-I"
@@ -22,6 +30,12 @@ getAllFaceDescriptors:
 	make faceDescriptorsKFW1
 	make faceDescriptorsKFW2
 	make faceDescriptorsTSK
+
+
+#################################
+###### WGEML Runner Targets #####
+#################################
+
 
 runWGEMLKFW1Unrestricted:
 	python3 -m src.scripts.run_WGEML "KinFaceW-I" "fd" "unrestricted"
@@ -61,6 +75,56 @@ runWGEML:
 	make runWGEMLKFW2Unrestricted
 	make runWGEMLKFW2Restricted
 	make runWGEMLTSK
+
+#################################
+####### Predictor Targets #######
+#################################
+
+runPredictionFW1Unrestricted:
+	python3 -m src.scripts.get_accuracies "KinFaceW-I" "fd" "unrestricted"
+	python3 -m src.scripts.get_accuracies "KinFaceW-I" "fs" "unrestricted"
+	python3 -m src.scripts.get_accuracies "KinFaceW-I" "md" "unrestricted"
+	python3 -m src.scripts.get_accuracies "KinFaceW-I" "ms" "unrestricted"
+
+runPredictionKFW1Restricted:
+	python3 -m src.scripts.get_accuracies "KinFaceW-I" "fd" "restricted"
+	python3 -m src.scripts.get_accuracies "KinFaceW-I" "fs" "restricted"
+	python3 -m src.scripts.get_accuracies "KinFaceW-I" "md" "restricted"
+	python3 -m src.scripts.get_accuracies "KinFaceW-I" "ms" "restricted"
+
+runPredictionKFW2Unrestricted:
+	python3 -m src.scripts.get_accuracies "KinFaceW-II" "fd" "unrestricted"
+	python3 -m src.scripts.get_accuracies "KinFaceW-II" "fs" "unrestricted"
+	python3 -m src.scripts.get_accuracies "KinFaceW-II" "md" "unrestricted"
+	python3 -m src.scripts.get_accuracies "KinFaceW-II" "ms" "unrestricted"
+
+runPredictionKFW2Restricted:
+	python3 -m src.scripts.get_accuracies "KinFaceW-II" "fd" "restricted"
+	python3 -m src.scripts.get_accuracies "KinFaceW-II" "fs" "restricted"
+	python3 -m src.scripts.get_accuracies "KinFaceW-II" "md" "restricted"
+	python3 -m src.scripts.get_accuracies "KinFaceW-II" "ms" "restricted"
+
+runPredictionTSK:
+	python3 -m src.scripts.get_accuracies "TSKinFace" "fd" "null"
+	python3 -m src.scripts.get_accuracies "TSKinFace" "fs" "null"
+	python3 -m src.scripts.get_accuracies "TSKinFace" "md" "null"
+	python3 -m src.scripts.get_accuracies "TSKinFace" "ms" "null"
+	python3 -m src.scripts.get_accuracies "TSKinFace" "fmd" "null"
+	python3 -m src.scripts.get_accuracies "TSKinFace" "fms" "null"
+
+runPrediction:
+	make runPredictionKFW1Unrestricted
+	make runPredictionKFW1Restricted
+	make runPredictionKFW2Unrestricted
+	make runPredictionKFW2Restricted
+	make runPredictionTSK
+
+# E2E make target
+
+runEndToEnd:
+	make getAllFaceDescriptors
+	make runWGEML
+	make runPrediction
 
 clean:
 	find -iname "*.pyc" -delete
