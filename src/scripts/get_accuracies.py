@@ -3,6 +3,7 @@ from ..prediction import predictor
 from ..data_preparation import save_and_load, prep_cross_valid
 from .. import dataPath
 import pickle
+import sys
 import os
 
 # Usage : python3 -m src.scripts.get_accuracies [dataset] [relationship_2_char] [restricted]
@@ -34,7 +35,7 @@ testSets = []
 if dataset.lower() == "tskinface":
     testSets = pickle.load(open(dataPath + "TSKinFace/splits/" + relationship + "_splits.pkl", "rb"))["testSets"]
 else:
-    testSets, _ = prep_cross_valid.get_positive_and_negative_pairs(pathToDataset + "meta_data/" + relationship + "_pairs.mat")
+    testSets, _ = prep_cross_valid.get_splits_for_positive_and_negative_pairs(pathToDataset + "meta_data/" + relationship + "_pairs.mat")
 
 accuracies = []
 # For each fold
@@ -53,6 +54,8 @@ for i in range(len(w)):
     # Save the accuracy in a list
     accuracies.append(acc)
 
+accuracies = np.array(accuracies)
+
 # Output the list of accuracies and the mean of it
-print(dataset + "-" + relationship + "-" + restricted + ": " + accuracies)
-print(dataset + "-" + relationship + "-" + restricted + ": " + accuracies.mean())
+print(dataset + "-" + relationship + "-" + restricted + ": " + str(accuracies))
+print(dataset + "-" + relationship + "-" + restricted + ": " + str(accuracies.mean()))

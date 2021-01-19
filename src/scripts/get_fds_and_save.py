@@ -32,7 +32,7 @@ for relationship in os.listdir(pathToDataset + "/images/"):
 LBP_fds = np.array(LBP_fds)
 HOG_fds = np.array(HOG_fds)
 SIFT_fds = np.array(SIFT_fds)
-VGG_fds = VGG.get_VGG_face_descriptor(images)
+VGG_fds = VGG.get_VGG_face_descriptor(np.array(images))
 
 
 # Reduce the dimensions of the face descriptors

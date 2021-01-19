@@ -80,7 +80,7 @@ runWGEML:
 ####### Predictor Targets #######
 #################################
 
-runPredictionFW1Unrestricted:
+runPredictionKFW1Unrestricted:
 	python3 -m src.scripts.get_accuracies "KinFaceW-I" "fd" "unrestricted"
 	python3 -m src.scripts.get_accuracies "KinFaceW-I" "fs" "unrestricted"
 	python3 -m src.scripts.get_accuracies "KinFaceW-I" "md" "unrestricted"
