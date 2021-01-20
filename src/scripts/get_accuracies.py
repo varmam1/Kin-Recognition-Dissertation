@@ -10,7 +10,7 @@ import os
 # This will get the accuracies for the dataset, relationship, restricted
 # configuration. 
 
-THETA = 0.9
+THETA = 0.6
 
 dataset = sys.argv[1]
 relationship = sys.argv[2]
@@ -31,11 +31,12 @@ for fd_map_name in os.listdir(pathToDataset + "fds"):
 # Then load in the test sets
 
 testSets = []
+negSets = []
 
 if dataset.lower() == "tskinface":
     testSets = pickle.load(open(dataPath + "TSKinFace/splits/" + relationship + "_splits.pkl", "rb"))["testSets"]
 else:
-    testSets, _ = prep_cross_valid.get_splits_for_positive_and_negative_pairs(pathToDataset + "meta_data/" + relationship + "_pairs.mat")
+    testSets, negSets = prep_cross_valid.get_splits_for_positive_and_negative_pairs(pathToDataset + "meta_data/" + relationship + "_pairs.mat")
 
 accuracies = []
 # For each fold
@@ -43,13 +44,23 @@ for i in range(len(w)):
     # use the fds and create the xs and ys pairs for the predictor
     test = testSets[i]
     xs = np.array([[fd[img] for fd in all_fd_maps] for img in test[:, 0]])
-    ys = np.array([[fd[img] for fd in all_fd_maps] for img in test[:, 1]])
     
     # Run the prediction algo
-    predictions = predictor.predict_if_kin_1(w[i], U[i], xs, ys, THETA, triRel=(len(relationship) == 3))
-    
-    # Check how many are correct 
-    acc = predictions.sum()/len(predictions)
+    predictionsPos = predictor.predict_if_kin_1(w[i], U[i], xs, ys, THETA, triRel=(len(relationship) == 3))
+
+    if len(negSets) != 0:
+        neg = negSets[i]
+        ys = np.array([[fd[img] for fd in all_fd_maps] for img in test[:, 1]])
+
+        negXS = np.array([[fd[img] for fd in all_fd_maps] for img in neg[:, 0]])
+        negYS = np.array([[fd[img] for fd in all_fd_maps] for img in neg[:, 1]])
+
+        predictionsNeg = predictor.predict_if_kin_1(w[i], U[i], negXS, negYS, THETA, triRel=(len(relationship) == 3))
+        
+        # Check how many are correct 
+        acc = (predictionsPos.sum() + len(predictionsNeg) - predictionsNeg.sum())/(len(predictionsPos) + len(predictionsNeg))
+    else:
+        acc = predictionsPos.sum()/len(predictionsPos)
 
     # Save the accuracy in a list
     accuracies.append(acc)
@@ -57,5 +68,5 @@ for i in range(len(w)):
 accuracies = np.array(accuracies)
 
 # Output the list of accuracies and the mean of it
-print(dataset + "-" + relationship + "-" + restricted + ": " + str(accuracies))
-print(dataset + "-" + relationship + "-" + restricted + ": " + str(accuracies.mean()))
+print(dataset + "-" + relationship + "-" + ("" if restricted is None else restricted) + ": " + str(accuracies))
+print(dataset + "-" + relationship + "-" + ("" if restricted is None else restricted) + ": " + str(accuracies.mean()))

@@ -38,36 +38,36 @@ getAllFaceDescriptors:
 
 
 runWGEMLKFW1Unrestricted:
-	python3 -m src.scripts.run_WGEML "KinFaceW-I" "fd" "unrestricted"
 	python3 -m src.scripts.run_WGEML "KinFaceW-I" "fs" "unrestricted"
-	python3 -m src.scripts.run_WGEML "KinFaceW-I" "md" "unrestricted"
+	python3 -m src.scripts.run_WGEML "KinFaceW-I" "fd" "unrestricted"
 	python3 -m src.scripts.run_WGEML "KinFaceW-I" "ms" "unrestricted"
+	python3 -m src.scripts.run_WGEML "KinFaceW-I" "md" "unrestricted"
 
 runWGEMLKFW1Restricted:
-	python3 -m src.scripts.run_WGEML "KinFaceW-I" "fd" "restricted"
 	python3 -m src.scripts.run_WGEML "KinFaceW-I" "fs" "restricted"
-	python3 -m src.scripts.run_WGEML "KinFaceW-I" "md" "restricted"
+	python3 -m src.scripts.run_WGEML "KinFaceW-I" "fd" "restricted"
 	python3 -m src.scripts.run_WGEML "KinFaceW-I" "ms" "restricted"
+	python3 -m src.scripts.run_WGEML "KinFaceW-I" "md" "restricted"
 
 runWGEMLKFW2Unrestricted:
-	python3 -m src.scripts.run_WGEML "KinFaceW-II" "fd" "unrestricted"
 	python3 -m src.scripts.run_WGEML "KinFaceW-II" "fs" "unrestricted"
-	python3 -m src.scripts.run_WGEML "KinFaceW-II" "md" "unrestricted"
+	python3 -m src.scripts.run_WGEML "KinFaceW-II" "fd" "unrestricted"
 	python3 -m src.scripts.run_WGEML "KinFaceW-II" "ms" "unrestricted"
+	python3 -m src.scripts.run_WGEML "KinFaceW-II" "md" "unrestricted"
 
 runWGEMLKFW2Restricted:
-	python3 -m src.scripts.run_WGEML "KinFaceW-II" "fd" "restricted"
 	python3 -m src.scripts.run_WGEML "KinFaceW-II" "fs" "restricted"
-	python3 -m src.scripts.run_WGEML "KinFaceW-II" "md" "restricted"
+	python3 -m src.scripts.run_WGEML "KinFaceW-II" "fd" "restricted"
 	python3 -m src.scripts.run_WGEML "KinFaceW-II" "ms" "restricted"
+	python3 -m src.scripts.run_WGEML "KinFaceW-II" "md" "restricted"
 
 runWGEMLTSK:
-	python3 -m src.scripts.run_WGEML "TSKinFace" "fd" "null"
 	python3 -m src.scripts.run_WGEML "TSKinFace" "fs" "null"
-	python3 -m src.scripts.run_WGEML "TSKinFace" "md" "null"
+	python3 -m src.scripts.run_WGEML "TSKinFace" "fd" "null"
 	python3 -m src.scripts.run_WGEML "TSKinFace" "ms" "null"
-	python3 -m src.scripts.run_WGEML "TSKinFace" "fmd" "null"
+	python3 -m src.scripts.run_WGEML "TSKinFace" "md" "null"
 	python3 -m src.scripts.run_WGEML "TSKinFace" "fms" "null"
+	python3 -m src.scripts.run_WGEML "TSKinFace" "fmd" "null"
 
 runWGEML:
 	make runWGEMLKFW1Unrestricted
@@ -81,36 +81,36 @@ runWGEML:
 #################################
 
 runPredictionKFW1Unrestricted:
-	python3 -m src.scripts.get_accuracies "KinFaceW-I" "fd" "unrestricted"
 	python3 -m src.scripts.get_accuracies "KinFaceW-I" "fs" "unrestricted"
-	python3 -m src.scripts.get_accuracies "KinFaceW-I" "md" "unrestricted"
+	python3 -m src.scripts.get_accuracies "KinFaceW-I" "fd" "unrestricted"
 	python3 -m src.scripts.get_accuracies "KinFaceW-I" "ms" "unrestricted"
+	python3 -m src.scripts.get_accuracies "KinFaceW-I" "md" "unrestricted"
 
 runPredictionKFW1Restricted:
-	python3 -m src.scripts.get_accuracies "KinFaceW-I" "fd" "restricted"
 	python3 -m src.scripts.get_accuracies "KinFaceW-I" "fs" "restricted"
-	python3 -m src.scripts.get_accuracies "KinFaceW-I" "md" "restricted"
+	python3 -m src.scripts.get_accuracies "KinFaceW-I" "fd" "restricted"
 	python3 -m src.scripts.get_accuracies "KinFaceW-I" "ms" "restricted"
+	python3 -m src.scripts.get_accuracies "KinFaceW-I" "md" "restricted"
 
 runPredictionKFW2Unrestricted:
-	python3 -m src.scripts.get_accuracies "KinFaceW-II" "fd" "unrestricted"
 	python3 -m src.scripts.get_accuracies "KinFaceW-II" "fs" "unrestricted"
-	python3 -m src.scripts.get_accuracies "KinFaceW-II" "md" "unrestricted"
+	python3 -m src.scripts.get_accuracies "KinFaceW-II" "fd" "unrestricted"
 	python3 -m src.scripts.get_accuracies "KinFaceW-II" "ms" "unrestricted"
+	python3 -m src.scripts.get_accuracies "KinFaceW-II" "md" "unrestricted"
 
 runPredictionKFW2Restricted:
-	python3 -m src.scripts.get_accuracies "KinFaceW-II" "fd" "restricted"
 	python3 -m src.scripts.get_accuracies "KinFaceW-II" "fs" "restricted"
-	python3 -m src.scripts.get_accuracies "KinFaceW-II" "md" "restricted"
+	python3 -m src.scripts.get_accuracies "KinFaceW-II" "fd" "restricted"
 	python3 -m src.scripts.get_accuracies "KinFaceW-II" "ms" "restricted"
+	python3 -m src.scripts.get_accuracies "KinFaceW-II" "md" "restricted"
 
 runPredictionTSK:
-	python3 -m src.scripts.get_accuracies "TSKinFace" "fd" "null"
 	python3 -m src.scripts.get_accuracies "TSKinFace" "fs" "null"
-	python3 -m src.scripts.get_accuracies "TSKinFace" "md" "null"
+	python3 -m src.scripts.get_accuracies "TSKinFace" "fd" "null"
 	python3 -m src.scripts.get_accuracies "TSKinFace" "ms" "null"
-	python3 -m src.scripts.get_accuracies "TSKinFace" "fmd" "null"
+	python3 -m src.scripts.get_accuracies "TSKinFace" "md" "null"
 	python3 -m src.scripts.get_accuracies "TSKinFace" "fms" "null"
+	python3 -m src.scripts.get_accuracies "TSKinFace" "fmd" "null"
 
 runPrediction:
 	make runPredictionKFW1Unrestricted

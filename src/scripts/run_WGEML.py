@@ -1,5 +1,6 @@
 import numpy as np
 import sys
+import pickle
 from scipy.io import loadmat, savemat
 from .. import dataPath
 from ..data_preparation import save_and_load, prep_cross_valid, properly_formatted_inputs
@@ -10,7 +11,7 @@ from ..WGEML import create_values
 # The above runs WGEML for the dataset KinFaceW-I with the father-daughter relationship
 # And with the image-unrestricted setting in which case negative pairs are given to WGEML
 
-dim_of_trans_matrix = 100
+dim_of_trans_matrix = 10
 
 dataset = sys.argv[1]
 relationship = sys.argv[2]
