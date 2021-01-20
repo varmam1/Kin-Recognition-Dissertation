@@ -83,8 +83,8 @@ def get_top_d_eigenvectors(A, B, d):
     - An np array of shape (d, D) where D is the dimension of each eigenvector
     which has the top d eigenvectors ordered by descending eigenvalue
     """
-    # eig_vals, eig_vecs = linalg.eig(np.dot(np.linalg.inv(B), A))
-    eig_vals, eig_vecs = linalg.eig(A, B)
+    eig_vals, eig_vecs = linalg.eig(np.dot(np.linalg.inv(B), A))
+    #eig_vals, eig_vecs = linalg.eig(A, B)
     eig_vecs = np.transpose(eig_vecs)
     return eig_vecs[eig_vals.argsort()[::-1]][:d]
 

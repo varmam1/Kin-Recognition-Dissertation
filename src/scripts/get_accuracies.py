@@ -44,13 +44,13 @@ for i in range(len(w)):
     # use the fds and create the xs and ys pairs for the predictor
     test = testSets[i]
     xs = np.array([[fd[img] for fd in all_fd_maps] for img in test[:, 0]])
+    ys = np.array([[fd[img] for fd in all_fd_maps] for img in test[:, 1]])
     
     # Run the prediction algo
     predictionsPos = predictor.predict_if_kin_1(w[i], U[i], xs, ys, THETA, triRel=(len(relationship) == 3))
 
     if len(negSets) != 0:
         neg = negSets[i]
-        ys = np.array([[fd[img] for fd in all_fd_maps] for img in test[:, 1]])
 
         negXS = np.array([[fd[img] for fd in all_fd_maps] for img in neg[:, 0]])
         negYS = np.array([[fd[img] for fd in all_fd_maps] for img in neg[:, 1]])
