@@ -55,11 +55,12 @@ if dataset != "TSKinFace":
 
 else:
     training, testing = prep_cross_valid.TSK_get_splits(pathToMat, True, relationship)
+    training_neg = pickle.load(open(dataPath + dataset + "/splits/neg_" + relationship + "_splits.pkl", "rb"))["training"]
     ws = []
     transformation_matrices = []
     for i in range(len(training)):
-        posPairSet, _ = properly_formatted_inputs.get_input_to_WGEML(training[i], None, listOfFDs)
-        U, w = create_values.get_all_values_for_a_relationship(posPairSet, dim_of_U=dim_of_trans_matrix)
+        posPairSet, negPairSet = properly_formatted_inputs.get_input_to_WGEML(training[i], training_neg[i], listOfFDs)
+        U, w = create_values.get_all_values_for_a_relationship(posPairSet, negPairSet=negPairSet, dim_of_U=dim_of_trans_matrix)
         ws.append(w)
         transformation_matrices.append(U)
     save_and_load.save_w_and_U(ws, transformation_matrices, relationship, dataset)

@@ -35,6 +35,7 @@ negSets = []
 
 if dataset.lower() == "tskinface":
     testSets = pickle.load(open(dataPath + "TSKinFace/splits/" + relationship + "_splits.pkl", "rb"))["testSets"]
+    negSets = pickle.load(open(dataPath + "TSKinFace/splits/neg_" + relationship + "_splits.pkl", "rb"))["testing"]
 else:
     testSets, negSets = prep_cross_valid.get_splits_for_positive_and_negative_pairs(pathToDataset + "meta_data/" + relationship + "_pairs.mat")
 
@@ -43,25 +44,24 @@ accuracies = []
 for i in range(len(w)):
     # use the fds and create the xs and ys pairs for the predictor
     test = testSets[i]
-    print(test.shape)
     xs = np.array([[fd[img] for fd in all_fd_maps] for img in test[:, 0]])
     ys = np.array([[fd[img] for fd in all_fd_maps] for img in test[:, 1]])
     
     # Run the prediction algo
     predictionsPos = predictor.predict_if_kin_1(w[i], U[i], xs, ys, THETA, triRel=(len(relationship) == 3))
 
-    if len(negSets) != 0:
-        neg = negSets[i]
+    # if len(negSets) != 0:
+    neg = negSets[i]
 
-        negXS = np.array([[fd[img] for fd in all_fd_maps] for img in neg[:, 0]])
-        negYS = np.array([[fd[img] for fd in all_fd_maps] for img in neg[:, 1]])
+    negXS = np.array([[fd[img] for fd in all_fd_maps] for img in neg[:, 0]])
+    negYS = np.array([[fd[img] for fd in all_fd_maps] for img in neg[:, 1]])
 
-        predictionsNeg = predictor.predict_if_kin_1(w[i], U[i], negXS, negYS, THETA, triRel=(len(relationship) == 3))
-        
-        # Check how many are correct 
-        acc = (predictionsPos.sum() + len(predictionsNeg) - predictionsNeg.sum())/(len(predictionsPos) + len(predictionsNeg))
-    else:
-        acc = predictionsPos.sum()/len(predictionsPos)
+    predictionsNeg = predictor.predict_if_kin_1(w[i], U[i], negXS, negYS, THETA, triRel=(len(relationship) == 3))
+    
+    # Check how many are correct 
+    acc = (predictionsPos.sum() + len(predictionsNeg) - predictionsNeg.sum())/(len(predictionsPos) + len(predictionsNeg))
+    # else:
+    #     acc = predictionsPos.sum()/len(predictionsPos)
 
     # Save the accuracy in a list
     accuracies.append(acc)
