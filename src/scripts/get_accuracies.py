@@ -43,6 +43,7 @@ accuracies = []
 for i in range(len(w)):
     # use the fds and create the xs and ys pairs for the predictor
     test = testSets[i]
+    print(test.shape)
     xs = np.array([[fd[img] for fd in all_fd_maps] for img in test[:, 0]])
     ys = np.array([[fd[img] for fd in all_fd_maps] for img in test[:, 1]])
     
