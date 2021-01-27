@@ -1,7 +1,7 @@
 import numpy as np
 
 
-def predict_if_kin_1(w, U, xs, ys, theta, triRel=False):
+def predict_if_kin_1(w, U, xs, ys, theta, triRel=False, fds_included = [True, True, True, True]):
     """
     Given the weights and U matrices for each view along with all of the pairs
     that need to be predicted whether they are of the kin relationship being
@@ -28,19 +28,26 @@ def predict_if_kin_1(w, U, xs, ys, theta, triRel=False):
         whether the corresponding pair is of the relation or not.
     """
     scoreVector = np.zeros(xs.shape[0])
+    weights = np.zeros(w.shape[0])
+    for i in range(len(w)):
+        if fds_included[i]:
+            weights[i] = w[i]
+    
+    weights = weights / np.sum(weights)
     for p in range(len(w)):
-        xs_p = xs[:, p]
-        ys_p = ys[:, p]
-        A_p = np.dot(U[p], np.transpose(U[p]))
-        w_p = w[p]
-        # This should be a vector of length N
-        inner_product_vals = np.einsum("ij, ij->i", np.dot(xs_p, A_p), ys_p)
-        x_norms = np.sqrt(np.einsum("ij, ij->i", np.dot(xs_p, A_p), xs_p))
-        y_norms = np.sqrt(np.einsum("ij, ij->i", np.dot(ys_p, A_p), ys_p))
+        if fds_included[p]:
+            xs_p = xs[:, p]
+            ys_p = ys[:, p]
+            A_p = np.dot(U[p], np.transpose(U[p]))
+            w_p = weights[p]
+            # This should be a vector of length N
+            inner_product_vals = np.einsum("ij, ij->i", np.dot(xs_p, A_p), ys_p)
+            x_norms = np.sqrt(np.einsum("ij, ij->i", np.dot(xs_p, A_p), xs_p))
+            y_norms = np.sqrt(np.einsum("ij, ij->i", np.dot(ys_p, A_p), ys_p))
 
-        cosine_vals = np.divide(inner_product_vals, np.multiply(x_norms, y_norms))
-        similarlity_vals = w_p * (cosine_vals + 1)/2
-        scoreVector = scoreVector + similarlity_vals
+            cosine_vals = np.divide(inner_product_vals, np.multiply(x_norms, y_norms))
+            similarlity_vals = w_p * (cosine_vals + 1)/2
+            scoreVector = scoreVector + similarlity_vals
 
     if triRel:
         # If tri-kin relationship, mean similarity between father and mother scores
