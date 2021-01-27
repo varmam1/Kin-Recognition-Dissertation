@@ -26,7 +26,7 @@ if restricted.lower() != "unrestricted" and restricted.lower() != "restricted":
 # A list ordered by ["HOG", "LBP", "SIFT", "VGG"] and the corresponding value
 # in this list checks whether it is included or not
 fd_names = np.array(["HOG", "LBP", "SIFT", "VGG"])
-out = open('out/' + dataset + ('_' + restricted if restricted is not None else "") + '.csv', 'w', newline='')
+out = open('out/ablation_studies' + dataset + ('_' + restricted if restricted is not None else "") + '.csv', 'w', newline='')
 csv_out = csv.writer(out)
 csv_out.writerow(['FDs Used'] + relationships)
 
@@ -84,7 +84,7 @@ for bit_fds_included in range(1, 16):
 
         # Output the list of accuracies and the mean of it
         print(dataset + "-" + relationship + "-" + ("" if restricted is None else restricted) + ": " + str(accuracies.mean()))
-        rel_accs.append(accuracies.mean())
+        rel_accs.append(np.round(accuracies.mean(), 4))
 
     csv_out.writerow(rel_accs)
 
