@@ -8,8 +8,8 @@ import os
 import csv
 
 # Usage : python3 -m src.scripts.ablation_study [dataset] [restricted]
-# This will get the accuracies for the dataset, relationship, restricted
-# configuration. 
+# This script will run every combination of face descriptors and get the
+# accuracies for each relationship and output it into a CSV file.
 
 THETA = 0.6
 
@@ -26,9 +26,9 @@ if restricted.lower() != "unrestricted" and restricted.lower() != "restricted":
 # A list ordered by ["HOG", "LBP", "SIFT", "VGG"] and the corresponding value
 # in this list checks whether it is included or not
 fd_names = np.array(["HOG", "LBP", "SIFT", "VGG"])
-out = open('out/' + dataset + '_' + restricted + '.csv', 'w', newline='') 
+out = open('out/' + dataset + ('_' + restricted if restricted is not None else "") + '.csv', 'w', newline='')
 csv_out = csv.writer(out)
-csv_out.writerow([''] + relationships)
+csv_out.writerow(['FDs Used'] + relationships)
 
 for bit_fds_included in range(1, 16):
     # face_descriptors_included = [True, True, True, True]
@@ -85,7 +85,7 @@ for bit_fds_included in range(1, 16):
         # Output the list of accuracies and the mean of it
         print(dataset + "-" + relationship + "-" + ("" if restricted is None else restricted) + ": " + str(accuracies.mean()))
         rel_accs.append(accuracies.mean())
-        # TODO: output to CSV cause thats a lotta numbers
+
     csv_out.writerow(rel_accs)
 
 out.close()
