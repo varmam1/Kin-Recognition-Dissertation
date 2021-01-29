@@ -26,10 +26,10 @@ if restricted.lower() != "unrestricted" and restricted.lower() != "restricted":
 # A list ordered by ["HOG", "LBP", "SIFT", "VGG"] and the corresponding value
 # in this list checks whether it is included or not
 fd_names = np.array(["HOG", "LBP", "SIFT", "VGG"])
-out = open('out/ablation_studies' + dataset + ('_' + restricted if restricted is not None else "") + '.csv', 'w', newline='')
+out = open('out/ablation_studies/' + dataset + ('_' + restricted if restricted is not None else "") + '.csv', 'w', newline='')
 csv_out = csv.writer(out)
 csv_out.writerow(['FDs Used'] + relationships)
-
+rowsSplitByInput = [[], [], [], []]
 for bit_fds_included in range(1, 16):
     # face_descriptors_included = [True, True, True, True]
     face_descriptors_included = np.array([bool(bit_fds_included & (1<<n)) for n in range(4)])
@@ -83,9 +83,13 @@ for bit_fds_included in range(1, 16):
         accuracies = np.array(accuracies)
 
         # Output the list of accuracies and the mean of it
-        print(dataset + "-" + relationship + "-" + ("" if restricted is None else restricted) + ": " + str(accuracies.mean()))
+        # print(dataset + "-" + relationship + "-" + ("" if restricted is None else restricted) + ": " + str(accuracies.mean()))
         rel_accs.append(np.round(accuracies.mean(), 4))
 
-    csv_out.writerow(rel_accs)
+    rowsSplitByInput[len(fd_names[face_descriptors_included]) - 1].append(rel_accs)
+
+for rows in rowsSplitByInput:
+    csv_out.writerows(rows)
+    csv_out.writerow([])
 
 out.close()

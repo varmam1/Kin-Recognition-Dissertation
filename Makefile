@@ -126,6 +126,13 @@ runEndToEnd:
 	make runWGEML
 	make runPrediction
 
+runAblationStudy:
+	python3 -m src.scripts.ablation_study "KinFaceW-I" "restricted"
+	python3 -m src.scripts.ablation_study "KinFaceW-I" "unrestricted"
+	python3 -m src.scripts.ablation_study "KinFaceW-II" "restricted"
+	python3 -m src.scripts.ablation_study "KinFaceW-II" "unrestricted"
+	python3 -m src.scripts.ablation_study "TSKinFace" "null"
+
 clean:
 	find -iname "*.pyc" -delete
 	find -iname "__pycache__" -delete
