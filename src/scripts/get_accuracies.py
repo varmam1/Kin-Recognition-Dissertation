@@ -50,7 +50,6 @@ for i in range(len(w)):
     # Run the prediction algo
     predictionsPos = predictor.predict_if_kin_1(w[i], U[i], xs, ys, THETA, triRel=(len(relationship) == 3))
 
-    # if len(negSets) != 0:
     neg = negSets[i]
 
     negXS = np.array([[fd[img] for fd in all_fd_maps] for img in neg[:, 0]])
@@ -60,8 +59,6 @@ for i in range(len(w)):
     
     # Check how many are correct 
     acc = (predictionsPos.sum() + len(predictionsNeg) - predictionsNeg.sum())/(len(predictionsPos) + len(predictionsNeg))
-    # else:
-    #     acc = predictionsPos.sum()/len(predictionsPos)
 
     # Save the accuracy in a list
     accuracies.append(acc)
