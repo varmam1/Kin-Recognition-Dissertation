@@ -119,6 +119,14 @@ runPrediction:
 	make runPredictionKFW2Restricted
 	make runPredictionTSK
 
+runPairwise:
+	python3 -m src.scripts.get_pairwise_accuracies "KinFaceW-I" "restricted"
+	python3 -m src.scripts.get_pairwise_accuracies "KinFaceW-I" "unrestricted"
+	python3 -m src.scripts.get_pairwise_accuracies "KinFaceW-II" "restricted"
+	python3 -m src.scripts.get_pairwise_accuracies "KinFaceW-II" "unrestricted"
+	python3 -m src.scripts.get_pairwise_accuracies "TSKinFace" "null"
+
+
 # E2E make target
 
 runEndToEnd:
