@@ -8,13 +8,10 @@ import sys
 import os
 import csv
 
-# TODO: For some reason, there's a difference in accs for KinFaceW-II and TSKin based on GPU vs local
-
 THETA = 0.6
 trainDataset = sys.argv[1]
 restricted = sys.argv[2]
 pathToTrainDataset = dataPath + trainDataset + "/"
-tskinfaceRun = False
 relationships = ["fs", "fd", "ms", "md"]
 
 if restricted.lower() != "unrestricted" and restricted.lower() != "restricted":
@@ -23,9 +20,15 @@ if restricted.lower() != "unrestricted" and restricted.lower() != "restricted":
 out = open('out/pairwise_accs/' + trainDataset + ('_' + restricted if restricted is not None else "") + '.csv', 'w', newline='')
 csv_out = csv.writer(out)
 csv_out.writerow(['Test Dataset Used'] + relationships)
+
+# For each dataset there is, use that for the testing set
 for testDataset in DATASETS:
+    
     print(testDataset)
+
     allRelationshipAccs = []
+    
+    # Do this for each relationship
     for relationship in relationships:
         # Load in face descriptors
         w, U = save_and_load.load_w_and_U(trainDataset, relationship, restricted)
