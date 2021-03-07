@@ -8,12 +8,13 @@ from keras.models import Sequential, Model, load_model
 from keras.initializers import *
 from keras.regularizers import *
 from keras.optimizers import SGD
-
+from keras.callbacks import LearningRateScheduler
+from math import exp, floor
 
 DEFAULT_CIFARNET_WEIGHTS_PATH = 'src/face_descriptors/CifarNet.h5'
 
 
-def define_CifarNet_model(num_classes=10, lr=0.05):
+def define_CifarNet_model(num_classes=10):
     """
     Creates a CNN which takes in a 32 x 32 x 3 input and has output shape of
     num_classes.
@@ -57,8 +58,6 @@ def define_CifarNet_model(num_classes=10, lr=0.05):
     model.add(AveragePooling2D(pool_size=(8, 8)))
     model.add(Flatten(name='flatten'))
     model.add(Dense(num_classes, activation="softmax"))
-    model.compile(optimizer=SGD(lr=lr, momentum=0.9), loss='categorical_crossentropy', metrics=['accuracy'])
-
     return model
 
 
@@ -89,7 +88,7 @@ def load_CIFAR_10_data():
     return (trainX, trainY), (testX, testY)
 
 
-def train_model(trainX, trainY, testX, testY, model, numEpochs=100, batch_size=16, save_location="CifarNet.h5"):
+def train_model(trainX, trainY, testX, testY, model, numEpochs=100, batch_size=32, save_location="CifarNet.h5", lr=0.05):
     """
     Given the dataset and the model, trains the model and saves the weights on disk. 
 
@@ -104,9 +103,20 @@ def train_model(trainX, trainY, testX, testY, model, numEpochs=100, batch_size=1
     - numEpochs: The amount of times SGD should be run for
     - batch_size: The batch size for SGD
     - save_location: Where the weights should be saved on disk
+    - lr: The learning rate for stochastic gradient descent
     """
 
-    model.fit(trainX, trainY, epochs=numEpochs, batch_size=batch_size, validation_data=(testX, testY))
+    def step_decay(epoch):
+        # Following got 91%
+        if epoch < 50:
+            return lr
+        if epoch < 75:
+            return lr/10
+        return lr/100
+
+    model.compile(optimizer=SGD(lr=lr, momentum=0.9), loss='categorical_crossentropy', metrics=['accuracy'])
+    lrate = LearningRateScheduler(step_decay)
+    model.fit(trainX, trainY, epochs=numEpochs, batch_size=batch_size, validation_data=(testX, testY), callbacks=[lrate])
     model.save(save_location)
 
 
@@ -124,7 +134,7 @@ def get_CFN_face_descriptor_model():
     Returns the CFN model without the softmax layer for face descriptors. 
     """
     model = keras.models.load_model(DEFAULT_CIFARNET_WEIGHTS_PATH)
-    return Model(inputs=model.input, outputs=model.layers[-1].output)
+    return Model(inputs=model.input, outputs=model.layers[-2].output)
 
 
 def get_CFN_face_descriptors(imgs):
