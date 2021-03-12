@@ -1,7 +1,7 @@
 import numpy as np
 
 
-def predict_if_kin_1(w, U, xs, ys, theta, triRel=False, fds_included = [True, True, True, True]):
+def predict_if_kin_1(w, U, xs, ys, theta, triRel=False, fds_included = None):
     """
     Given the weights and U matrices for each view along with all of the pairs
     that need to be predicted whether they are of the kin relationship being
@@ -27,6 +27,9 @@ def predict_if_kin_1(w, U, xs, ys, theta, triRel=False, fds_included = [True, Tr
     - A boolean np array of shape (N, ) in which each element corresponds to
         whether the corresponding pair is of the relation or not.
     """
+    if fds_included is None:
+        fds_included = np.ones(w.shape[0], dtype=bool)
+
     scoreVector = np.zeros(xs.shape[0])
     weights = np.zeros(w.shape[0])
     for i in range(len(w)):

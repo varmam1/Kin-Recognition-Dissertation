@@ -15,6 +15,9 @@ THETA = 0.6
 dataset = sys.argv[1]
 relationship = sys.argv[2]
 restricted = sys.argv[3]
+exclusions = []
+if len(sys.argv) == 5:
+    exclusions = sys.argv[4].split(",")
 
 if restricted.lower() != "unrestricted" and restricted.lower() != "restricted":
     restricted = None
@@ -24,9 +27,7 @@ w, U = save_and_load.load_w_and_U(dataset, relationship, restricted)
 # Load in face descriptors
 
 pathToDataset = dataPath + dataset + "/"
-all_fd_maps = []
-for fd_map_name in os.listdir(pathToDataset + "fds"):
-    all_fd_maps.append(pickle.load(open(pathToDataset + "fds/" + fd_map_name, "rb")))
+all_fd_maps = save_and_load.unpickle_face_descriptors(dataset, exclude=exclusions)
 
 # Then load in the test sets
 

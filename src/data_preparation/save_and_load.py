@@ -4,7 +4,7 @@ import os
 from .. import dataPath
 
 
-def unpickle_face_descriptors(dataset):
+def unpickle_face_descriptors(dataset, exclude=[]):
     """
     Given the dataset, gets the face descriptors already calculated and loads
     them in as a list of the maps.
@@ -13,6 +13,9 @@ def unpickle_face_descriptors(dataset):
     - dataset (str): A string which represents the dataset that the fds are
     obtained from. 
 
+    Optional Argument:
+    - exclude: A list of strings which contain face descriptors that shouldn't be loaded
+
     Returns:
     - A list of the maps of the face descriptors for the images in the
     dataset.
@@ -20,7 +23,13 @@ def unpickle_face_descriptors(dataset):
     pathToFDs = dataPath + dataset + "/fds/"
     fd_maps = []
     for f in os.listdir(pathToFDs):
-        fd_maps.append(pickle.load(open(pathToFDs + f, "rb")))
+        should_load = True
+        for fd_name in exclude:
+            if fd_name == f.split("_")[0]:
+                should_load = False
+        
+        if should_load:
+            fd_maps.append(pickle.load(open(pathToFDs + f, "rb")))
     return fd_maps
 
 

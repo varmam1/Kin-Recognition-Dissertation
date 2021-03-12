@@ -126,6 +126,28 @@ runPairwise:
 	python3 -m src.scripts.get_pairwise_accuracies "KinFaceW-II" "unrestricted"
 	python3 -m src.scripts.get_pairwise_accuracies "TSKinFace" "null"
 
+run_KFWI_CFN_Unrestricted:
+	python3 -m src.scripts.run_WGEML "KinFaceW-I" "fs" "unrestricted" "VGG"
+	python3 -m src.scripts.run_WGEML "KinFaceW-I" "fd" "unrestricted" "VGG"
+	python3 -m src.scripts.run_WGEML "KinFaceW-I" "ms" "unrestricted" "VGG"
+	python3 -m src.scripts.run_WGEML "KinFaceW-I" "md" "unrestricted" "VGG"
+
+	python3 -m src.scripts.get_accuracies "KinFaceW-I" "fs" "unrestricted" "VGG"
+	python3 -m src.scripts.get_accuracies "KinFaceW-I" "fd" "unrestricted" "VGG"
+	python3 -m src.scripts.get_accuracies "KinFaceW-I" "ms" "unrestricted" "VGG"
+	python3 -m src.scripts.get_accuracies "KinFaceW-I" "md" "unrestricted" "VGG"
+
+run_KFWI_CFN_Restricted:
+	python3 -m src.scripts.run_WGEML "KinFaceW-I" "fs" "restricted" "VGG"
+	python3 -m src.scripts.run_WGEML "KinFaceW-I" "fd" "restricted" "VGG"
+	python3 -m src.scripts.run_WGEML "KinFaceW-I" "ms" "restricted" "VGG"
+	python3 -m src.scripts.run_WGEML "KinFaceW-I" "md" "restricted" "VGG"
+
+	python3 -m src.scripts.get_accuracies "KinFaceW-I" "fs" "restricted" "VGG"
+	python3 -m src.scripts.get_accuracies "KinFaceW-I" "fd" "restricted" "VGG"
+	python3 -m src.scripts.get_accuracies "KinFaceW-I" "ms" "restricted" "VGG"
+	python3 -m src.scripts.get_accuracies "KinFaceW-I" "md" "restricted" "VGG"
+
 
 # E2E make target
 
