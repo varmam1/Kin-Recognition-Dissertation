@@ -6,7 +6,7 @@ from .. import dataPath
 from ..data_preparation import save_and_load, prep_cross_valid, properly_formatted_inputs
 from ..WGEML import create_values
 
-# Usage : python3 -m src.scripts.run_WGEML [dataset] [relationship_2_char] [restricted]
+# Usage : python3 -m src.scripts.run_WGEML [dataset] [relationship_2_char] [restricted] [optional: exclude list]
 # Ex. python3 -m src.scripts.run_WGEML KinFaceW-I fd unrestricted
 # The above runs WGEML for the dataset KinFaceW-I with the father-daughter relationship
 # And with the image-unrestricted setting in which case negative pairs are given to WGEML
@@ -16,12 +16,15 @@ dim_of_trans_matrix = 10
 dataset = sys.argv[1]
 relationship = sys.argv[2]
 restricted = sys.argv[3]
+exclusions = []
+if len(sys.argv) == 5:
+    exclusions = sys.argv[4].split(",")
 
 # mat_to_cross_folds
 pathToMat = dataPath + dataset + "/meta_data/" + relationship + "_pairs.mat"
 
 # Unpickle the face descriptors
-listOfFDs = save_and_load.unpickle_face_descriptors(dataset)
+listOfFDs = save_and_load.unpickle_face_descriptors(dataset, exclude=exclusions)
 
 if dataset != "TSKinFace":
     positiveSplits, negativeSplits = prep_cross_valid.get_splits_for_positive_and_negative_pairs(pathToMat)

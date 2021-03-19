@@ -4,7 +4,7 @@ import sys
 import os
 import pickle
 from ..data_preparation import PCA
-from ..face_descriptors import VGG, SIFT, LBP, HOG
+from ..face_descriptors import VGG, SIFT, LBP, HOG, CifarNet
 from .. import dataPath
 
 dataset = sys.argv[1]
@@ -33,6 +33,7 @@ LBP_fds = np.array(LBP_fds)
 HOG_fds = np.array(HOG_fds)
 SIFT_fds = np.array(SIFT_fds)
 VGG_fds = VGG.get_VGG_face_descriptor(np.array(images))
+CFN_fds = CifarNet.get_CFN_face_descriptors(np.array(images))
 
 
 # Reduce the dimensions of the face descriptors
@@ -40,12 +41,14 @@ reduced_LBP_fds = PCA.reduce_dimensions(LBP_fds)
 reduced_HOG_fds = PCA.reduce_dimensions(HOG_fds)
 reduced_SIFT_fds = PCA.reduce_dimensions(SIFT_fds)
 reduced_VGG_fds = PCA.reduce_dimensions(VGG_fds)
+reduced_CFN_fds = PCA.reduce_dimensions(CFN_fds, dim=100)
 
 # Match the vectors to the image names
 LBP_map = dict(zip(pathsToAllImages, reduced_LBP_fds))
 HOG_map = dict(zip(pathsToAllImages, reduced_HOG_fds))
 SIFT_map = dict(zip(pathsToAllImages, reduced_SIFT_fds))
 VGG_map = dict(zip(pathsToAllImages, reduced_VGG_fds))
+CFN_map = dict(zip(pathsToAllImages, reduced_CFN_fds))
 
 # Save the face descriptors on disk
 
@@ -64,3 +67,7 @@ SIFT_face_descriptors_file.close()
 VGG_face_descriptors_file = open(pathToDataset + "/fds/VGG_face_descriptors.pkl", "wb")
 pickle.dump(VGG_map, VGG_face_descriptors_file)
 VGG_face_descriptors_file.close()
+
+CFN_face_descriptors_file = open(pathToDataset + "/fds/CFN_face_descriptors.pkl", "wb")
+pickle.dump(CFN_map, CFN_face_descriptors_file)
+CFN_face_descriptors_file.close()
