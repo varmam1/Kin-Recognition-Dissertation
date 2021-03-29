@@ -15,7 +15,7 @@ def face_detector(img):
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
     # faceCascade imports in the previously made classifier
-    faceCascade = cv2.CascadeClassifier('src/face_recognition/haarcascade_frontalface_default.xml')
+    faceCascade = cv2.CascadeClassifier('src/face_detection/haarcascade_frontalface_default.xml')
     faces = faceCascade.detectMultiScale(
         gray,     
         scaleFactor=1.2,
