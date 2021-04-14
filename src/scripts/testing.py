@@ -6,7 +6,7 @@ import pickle
 import sys
 import os
 
-# Usage : python3 -m src.scripts.get_accuracies [dataset] [relationship_2_char] [restricted]
+# Usage : python3 -m src.scripts.testing [dataset] [relationship_2_char] [restricted]
 # This will get the accuracies for the dataset, relationship, restricted
 # configuration. 
 
