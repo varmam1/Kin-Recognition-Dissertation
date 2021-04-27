@@ -4,7 +4,7 @@ import pickle
 from scipy.io import loadmat, savemat
 from .. import dataPath
 from ..data_preparation import save_and_load, prep_cross_valid, properly_formatted_inputs
-from ..WGEML import create_values
+from ..WGEML import WGEML_training
 
 # Usage : python3 -m src.scripts.run_WGEML [dataset] [relationship_2_char] [restricted] [optional: exclude list]
 # Ex. python3 -m src.scripts.run_WGEML KinFaceW-I fd unrestricted
@@ -44,12 +44,12 @@ if dataset != "TSKinFace":
         posPairSet, negPairSet = properly_formatted_inputs.get_input_to_WGEML(posPairs, negPairs, listOfFDs)
 
         if restricted.lower() == "unrestricted":
-            U, w = create_values.get_all_values_for_a_relationship(posPairSet, negPairSet=negPairSet, dim_of_U=dim_of_trans_matrix)
+            U, w = WGEML_training.get_all_values_for_a_relationship(posPairSet, negPairSet=negPairSet, dim_of_U=dim_of_trans_matrix)
             ws.append(w)
             transformation_matrices.append(U)
         
         else:
-            U, w = create_values.get_all_values_for_a_relationship(posPairSet, dim_of_U=dim_of_trans_matrix)
+            U, w = WGEML_training.get_all_values_for_a_relationship(posPairSet, dim_of_U=dim_of_trans_matrix)
             ws.append(w)
             transformation_matrices.append(U)
 
@@ -63,7 +63,7 @@ else:
     transformation_matrices = []
     for i in range(len(training)):
         posPairSet, negPairSet = properly_formatted_inputs.get_input_to_WGEML(training[i], training_neg[i], listOfFDs)
-        U, w = create_values.get_all_values_for_a_relationship(posPairSet, negPairSet=negPairSet, dim_of_U=dim_of_trans_matrix)
+        U, w = WGEML_training.get_all_values_for_a_relationship(posPairSet, negPairSet=negPairSet, dim_of_U=dim_of_trans_matrix)
         ws.append(w)
         transformation_matrices.append(U)
     save_and_load.save_w_and_U(ws, transformation_matrices, relationship, dataset)

@@ -18,13 +18,13 @@ coverage:
 #################################
 
 faceDescriptorsKFW1:
-	python3 -m src.scripts.get_fds_and_save "KinFaceW-I"
+	python3 -m src.scripts.preprocessing_fds "KinFaceW-I"
 
 faceDescriptorsKFW2:
-	python3 -m src.scripts.get_fds_and_save "KinFaceW-II"
+	python3 -m src.scripts.preprocessing_fds "KinFaceW-II"
 
 faceDescriptorsTSK:
-	python3 -m src.scripts.get_fds_and_save "TSKinFace"
+	python3 -m src.scripts.preprocessing_fds "TSKinFace"
 
 getAllFaceDescriptors:
 	make faceDescriptorsKFW1
