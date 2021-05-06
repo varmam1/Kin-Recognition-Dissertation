@@ -31,7 +31,6 @@ def compute_gradients(img):
     # If the image is colored, take max for each pixel along the 3 channels
     if len(img.shape) == 3:
         magnitude = np.amax(magnitude, axis=(2))
-        # TODO: Angle might be wrong
         angle = np.amax(angle, axis=(2))
 
     angle = angle % 180

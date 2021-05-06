@@ -152,7 +152,6 @@ def get_all_values_for_a_relationship(posPairSet, negPairSet=None, dim_of_U=10):
         combination_of_all_D = 0.5*(D_1p + D_2p) + D_p
 
         U_p = np.transpose(get_top_d_eigenvectors(combination_of_all_D, S_p, dim_of_U))
-        # TODO: For eigenvectors, does it want a normalized eigenvector???
         transformation_matrices.append(U_p)
 
         # Obtain w_p using U_p
