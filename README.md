@@ -5,6 +5,12 @@
 
 The project implements the paper Weighted Graph Embedding-Based Metric Learning for Kinship Verification (Liang et al., 2019) for the purposes of kinship verification and tri-kinship verification using Python 3.6. The algorithm, WGEML, is implemented and trained on the KinFaceW-I, KinFaceW-II, and TSKinFace datasets. Each of the KinFaceW datasets have 2 settings, unrestricted and restricted, in which unrestricted means that both positive and negative pairs are used in the training process whereas restricted only uses positive pairs. A model is created for a specified dataset, setting and relationship, such as father-daughter (FD). 
 
+## Original Aims of the Project
+Kin recognition is the ability to recognize whether two people are related to each other just by looking at them. The goal of the project was to implement a state-of-the-art model, Weighted Graph Embedding-Based Metric Learning (WGEML), to solve the Kin Verification problem and to verify the accuracies obtained. I also wanted to further evaluate the models obtained by looking at potential biases in the datasets used in the paper.
+
+## Work Completed
+I successfully implemented WGEML and was able to recreate the original accuracies within an acceptable range. Furthermore, I performed ablation studies in order to determine if there is a relationship between the number of face descriptors used and the accuracy of the model. I also replaced one face descriptor with a less computationally expensive one. I explored biases in the datasets used using the model that was created and discussed the implications of such biases on the results. 
+
 ## Setup
 
 Firstly, the dependencies must be obtained which can be done running:
