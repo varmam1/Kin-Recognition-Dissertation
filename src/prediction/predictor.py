@@ -1,6 +1,31 @@
 import numpy as np
 
 def get_similarity(w, U, xs, ys, triRel=False, fds_included = None):
+    """
+    Given the weights and U matrices for each view along with all of the pairs
+    that need to be predicted whether they are of the kin relationship being
+    tested or not, returns a vector corresponding to the similarity of the pair.
+
+    Keyword Arguments:
+    - w: The w vector of shape (M, ) where M is the amount of face descriptors
+        used
+    - U: The U_p matrices in which U is an array of length M and each matrix
+        has shape (d, D) where d << D.
+    - xs: An np array of shape (N, M, D) which has all of the face descriptors
+        for each image that the prediction is wanted from. For all i in [0, N)
+        xs[i] is paired with ys[i] and whether they are of the kinship relation
+        is what is being tested.
+    - ys: An np array of shape (N, M, D) with the same description as xs.
+    - theta: A float which represents the threshold that cosine similarity
+        should be if they are of the kin relation.
+    - triRel: A boolean which represents whether this is being tested for a tri
+        kin relationship.
+
+    Returns:
+    - An np array of shape (N, ) in which each element corresponds to
+        the similarity score of the corresponding pair.
+
+    """
     if fds_included is None:
         fds_included = np.ones(w.shape[0], dtype=bool)
 
@@ -34,7 +59,7 @@ def get_similarity(w, U, xs, ys, triRel=False, fds_included = None):
     return scoreVector
 
 
-def predict_if_kin_1(w, U, xs, ys, theta, triRel=False, fds_included = None):
+def predict(w, U, xs, ys, theta, triRel=False, fds_included = None):
     """
     Given the weights and U matrices for each view along with all of the pairs
     that need to be predicted whether they are of the kin relationship being

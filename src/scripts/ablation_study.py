@@ -64,14 +64,14 @@ for bit_fds_included in range(1, 2**(len(fd_names))):
             ys = np.array([[fd[img] for fd in all_fd_maps] for img in test[:, 1]])
             
             # Run the prediction algo
-            predictionsPos = predictor.predict_if_kin_1(w[i], U[i], xs, ys, THETA, triRel=(len(relationship) == 3), fds_included=face_descriptors_included)
+            predictionsPos = predictor.predict(w[i], U[i], xs, ys, THETA, triRel=(len(relationship) == 3), fds_included=face_descriptors_included)
 
             neg = negSets[i]
 
             negXS = np.array([[fd[img] for fd in all_fd_maps] for img in neg[:, 0]])
             negYS = np.array([[fd[img] for fd in all_fd_maps] for img in neg[:, 1]])
 
-            predictionsNeg = predictor.predict_if_kin_1(w[i], U[i], negXS, negYS, THETA, triRel=(len(relationship) == 3), fds_included=face_descriptors_included)
+            predictionsNeg = predictor.predict(w[i], U[i], negXS, negYS, THETA, triRel=(len(relationship) == 3), fds_included=face_descriptors_included)
             
             # Check how many are correct 
             acc = (predictionsPos.sum() + len(predictionsNeg) - predictionsNeg.sum())/(len(predictionsPos) + len(predictionsNeg))

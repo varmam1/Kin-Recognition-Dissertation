@@ -20,7 +20,7 @@ def test_prediction_algo_1_with_Euclidean_metric_with_1_view():
                    [[3, 1, 4]]])
     theta = 0.9
 
-    out = predictor.predict_if_kin_1(w, U, xs, ys, theta)
+    out = predictor.predict(w, U, xs, ys, theta)
     expectedOut = []
     for i in range(5):
         x = xs[i][0]
@@ -49,7 +49,7 @@ def test_prediction_algo_1_with_nonEuclidean_metric_with_2_views():
                    [[3, 1, 4], [1, 4, 1]]])
     theta = 0.9
 
-    out = predictor.predict_if_kin_1(w, U, xs, ys, theta)
+    out = predictor.predict(w, U, xs, ys, theta)
     expectedOut = []
 
     for i in range(5):
@@ -81,6 +81,6 @@ def test_prediction_algo_1_with_Euclidean_metric_with_1_view_with_tri_relationsh
                    [[-1, -2, -1]]])
     theta = 0.8
 
-    out = predictor.predict_if_kin_1(w, U, xs, ys, theta, triRel=True)
+    out = predictor.predict(w, U, xs, ys, theta, triRel=True)
     expectedOut = np.array([True, False])
     assert (out == expectedOut).all()
