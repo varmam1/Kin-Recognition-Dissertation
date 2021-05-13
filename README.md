@@ -9,11 +9,15 @@ The project implements the paper Weighted Graph Embedding-Based Metric Learning 
 
 Firstly, the dependencies must be obtained which can be done running:
 
-`make init`
+```bash
+make init
+```
 
 in the root folder of the project. To make sure everything is working properly, the unit tests can be ran using:
 
-`make coverage`
+```bash
+make coverage
+```
 
 which should come back all fine. 
 
@@ -21,41 +25,57 @@ which should come back all fine.
 
 To compute the face descriptors for each of the datasets, the make command:
 
-`make getAllFaceDescriptors`
+```bash
+make getAllFaceDescriptors
+```
 
 can be run. NB: This takes a while to run and the VGG network is used to compute face descriptors so it might be useful to run this on a GPU. 
 
 Furthermore, the cross validation splits for TSKinFace along with negative pairs need to be generated, or the ones that are in the repo can be used if wanted. If you want to get new splits, the following can be run:
 
-`python3 -m src.scripts.preprocessing_TSK`
+```bash
+python3 -m src.scripts.preprocessing_TSK
+```
 
 ## Training
 
 To train the model for a given dataset, setting, and relationship:
 
-`python3 -m src.scripts.training [dataset] [2-character relationship code] [restricted/unrestricted]`
+```bash
+python3 -m src.scripts.training [dataset] [2-character relationship code] [restricted/unrestricted]
+```
 
 Should be run. To run this with TSKinFace which has no unrestricted vs restricted setting, just set the third parameter to be "null". This can all be ran using the make commands such as:
 
-`make runWGEMLKFW1Unrestricted`
+```bash
+make runWGEMLKFW1Unrestricted
+```
 
 Which trains WGEML on KinFaceW-I Unrestricted for each relationship. To train each dataset, setting and relationship, run:
 
-`make runWGEML`
+```bash
+make runWGEML
+```
 
 ## Testing
 
 Similarly for testing, for a given dataset, setting and relationship:
 
-`python3 -m src.scripts.testing [dataset] [2-character relationship code] [restricted/unrestricted]`
+```bash
+python3 -m src.scripts.testing [dataset] [2-character relationship code] [restricted/unrestricted]
+```
 
 Should be run which prints out the accuracies for each individual fold in the cross-validation splits and the average accuracy among them. Similarly to testing, to run it for a dataset and setting, we can do something like:
 
-`make runPredictionKFW1Unrestricted`
+```bash
+make runPredictionKFW1Unrestricted
+```
 
 And we can run:
 
-`make runPrediction`
+```bash
+make runPrediction
+```
 
 To print out the accuracies for each dataset, setting and relationship supported. 
 
@@ -63,5 +83,7 @@ To print out the accuracies for each dataset, setting and relationship supported
 
 Although it is suggested to run each part individually, a make target is created to run it end to end which is:
 
-`make runEndToEnd`
+```bash
+make runEndToEnd
+```
 
